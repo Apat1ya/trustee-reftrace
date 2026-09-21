@@ -1,0 +1,15 @@
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+target/
+
+# IntelliJ IDEA
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Logs
+*.log
+
+# Output of local runs (reports, stored results)
+runs/

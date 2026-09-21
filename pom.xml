@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.1.1</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>dev.reftrace</groupId>
+    <artifactId>trustee-reftrace</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <name>trustee-reftrace</name>
+    <description>Daily monitor that verifies the trustee.io referral key reaches the app store links</description>
+
+    <properties>
+        <java.version>25</java.version>
+        <playwright.version>1.63.0</playwright.version>
+        <error-prone.version>2.50.0</error-prone.version>
+        <nullaway.version>0.14.1</nullaway.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <!-- Boot 4 is modular: the JSON layer (Jackson 3) is not part of the core starter. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jackson</artifactId>
+        </dependency>
+        <!-- The sitemap is fetched over HTTP: RestClient and its request factory live here. -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+        <!--
+            Traces of each page visit, exported over OTLP when an endpoint is configured: Micrometer
+            Observation with the OpenTelemetry bridge and exporter.
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-opentelemetry</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.microsoft.playwright</groupId>
+            <artifactId>playwright</artifactId>
+            <version>${playwright.version}</version>
+        </dependency>
+        <!-- QR codes: core reads the symbol, javase hands it a BufferedImage. -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.5.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>javase</artifactId>
+            <version>3.5.4</version>
+        </dependency>
+        <!-- Nullness annotations (@NullMarked, @Nullable); version comes from the Boot parent. -->
+        <dependency>
+            <groupId>org.jspecify</groupId>
+            <artifactId>jspecify</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- TestObservationRegistry: which observations a visit made, and which one each belongs to. -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-observation-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--
+                Declare the processor explicitly: since JDK 23 javac no longer picks up annotation
+                processors from the compile classpath, so the configuration metadata would silently
+                never be written.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.springframework.boot</groupId>
+                            <artifactId>spring-boot-configuration-processor</artifactId>
+                            <version>${project.parent.version}</version>
+                        </path>
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>${error-prone.version}</version>
+                        </path>
+                        <path>
+                            <groupId>com.uber.nullaway</groupId>
+                            <artifactId>nullaway</artifactId>
+                            <version>${nullaway.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <compilerArgs>
+                        <!--
+                            Error Prone is a javac plugin and reaches into javac's internals, which the
+                            compiler JVM has to open for it: see `.mvn/jvm.config`. The compiler is not
+                            forked, so those flags live there rather than as `-J` arguments here.
+                        -->
+                        <!-- Error Prone needs the whole compilation unit at once; javac's default policy interleaves. -->
+                        <arg>-XDcompilePolicy=simple</arg>
+                        <!-- Keep javac alive through flow analysis after an error so Error Prone still sees the tree. -->
+                        <arg>--should-stop=ifError=FLOW</arg>
+                        <!-- Type-use annotations (JSpecify @Nullable) must reach the symbol, not just the tree. -->
+                        <arg>-XDaddTypeAnnotationsToSymbol=true</arg>
+                        <!-- Error Prone has no "all warnings as errors" flag of its own; javac's -Werror does it. -->
+                        <arg>-Werror</arg>
+                        <arg>-Xplugin:ErrorProne
+                            -Xep:NullAway:ERROR
+                            -XepOpt:NullAway:AnnotatedPackages=dev.reftrace
+                            -XepOpt:NullAway:JSpecifyMode=true
+                        </arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.5.0</version>
+            </plugin>
+            <!-- *Test runs without a browser in `test`, *IT needs Playwright and runs in `verify`. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

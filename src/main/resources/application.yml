@@ -1,0 +1,202 @@
+spring:
+  application:
+    name: trustee-reftrace
+  main:
+    banner-mode: "off"
+    web-application-type: none
+
+# Traces are sent over OTLP only when management.opentelemetry.tracing.export.otlp.endpoint is set.
+# Metrics are sent only when management.otlp.metrics.export.enabled=true and .url are set.
+management:
+  tracing:
+    sampling:
+      # Trace every page visit.
+      probability: 1.0
+  otlp:
+    metrics:
+      export:
+        # Off by default; otherwise metrics go to localhost:4318 every minute.
+        enabled: false
+  opentelemetry:
+    resource-attributes:
+      # Unique per process, so parallel runs do not overwrite each other's metrics.
+      "[service.instance.id]": ${random.uuid}
+
+reftrace:
+  browser:
+    headless: true
+    # Which links are clicked, exits and walk steps alike:
+    #   all        every link, even hidden, covered, moving or disabled
+    #   reachable  only links a visitor can press; other exits are judged by href only,
+    #              other steps are skipped and the report says what blocked them
+    clicks: all
+    # Requests to these hosts are blocked.
+    blocked-analytics-hosts:
+      - "connect.facebook.net"
+      - "www.facebook.com"
+      - "*.google-analytics.com"
+      - "www.googletagmanager.com"
+      - "*.doubleclick.net"
+      - "*.hotjar.com"
+      - "*.clarity.ms"
+    # Page blocks whose links are checked but never clicked as a walk step.
+    unwalked-blocks:
+      # Language switcher modal.
+      - "aside[class*=modal] [class*=lang-modal]"
+      # Language selector in the page footer.
+      - "[class*=localization-selector]"
+  # Browser profiles; every page is walked in each of them.
+  # engine: chromium or webkit (the Safari engine). Firefox is not supported: it cannot emulate mobile.
+  # locale: optional, for example ru-RU; the browser's default when absent.
+  profiles:
+    - name: desktop-chrome
+      engine: chromium
+      user-agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36"
+      viewport: { width: 1440, height: 900 }
+    - name: android-pixel
+      engine: chromium
+      user-agent: "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Mobile Safari/537.36"
+      viewport: { width: 412, height: 915 }
+      device-scale-factor: 2.625
+      mobile: true
+      touch: true
+    - name: iphone-safari
+      engine: webkit
+      user-agent: "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1"
+      viewport: { width: 390, height: 844 }
+      device-scale-factor: 3
+      mobile: true
+      touch: true
+  # Pages visited at the same time, one browser context each.
+  parallel-browsers: 6
+  # Durations take ms, s, m, h or d.
+  # 0 disables page-load, operation, deadline, time, depth, pages and visits; the rest must be positive.
+  limits:
+    action:
+      # Page load timeout.
+      page-load: 15s
+      # The page counts as settled after this long without new links.
+      settle-quiet: 600ms
+      # Longest wait for the page to settle; after it the page is read as is.
+      settle-max: 8s
+      # Timeout for a click or a screenshot.
+      operation: 5s
+      # A click that starts no navigation within this time is a failed check.
+      click-navigation: 2s
+    visit:
+      # Time for one attempt to visit a page.
+      deadline: 60s
+      # Attempts per page visit.
+      max-attempts: 3
+      # Pause before the first retry, multiplied by backoff-multiplier for each next one.
+      backoff: 2s
+      backoff-multiplier: 2.0
+    run:
+      # Run duration; pages not visited by then count as failed.
+      time: 6h
+      # Maximum click depth; the start page is 1.
+      depth: 0
+      # Maximum number of different pages per run.
+      pages: 0
+      # Maximum number of page visits per run, counting each profile.
+      visits: 0
+  # Page elements opened to uncover hidden links. action: click or hover.
+  reveal:
+    # Turns revealing off entirely.
+    enabled: true
+    # Time spent revealing on one page.
+    budget: 5s
+    # Clicks and hovers allowed on one page.
+    max-actions: 24
+    # Clicked once the page has settled.
+    revealers:
+      # Closes the card order form that covers the page.
+      - name: card-order-form
+        selector: "aside[class*=modal--opened]:has(form) button[class*=modal__close]"
+        action: click
+    # Menus opened before clicking a link inside them.
+    menus:
+      - name: burger
+        selector: "header [class*=togglers] > [class*=burger]"
+        action: click
+      - name: submenu
+        selector: "header [class*=mobile-first-level__arrow]"
+        action: click
+  report:
+    # Directory for run reports.
+    output-dir: runs
+    # Screenshots of problems.
+    screenshots: true
+    # Browser traces of failed visits.
+    traces: true
+    # How long to keep old runs, screenshots and traces; 0 keeps them forever.
+    retention:
+      run: 7d
+      screenshots: 7d
+      traces: 7d
+  # Query parameter that carries the referral key.
+  key-param: r
+  # Read QR codes on pages and check the links in them.
+  qr-check: true
+  # Each entry is a page URL or {sitemap: URL}; every page a sitemap lists becomes a start page.
+  start:
+    - https://trustee.io/
+    - sitemap: https://trustee.io/main-sitemap.xml
+  # Rules for links. The last matching route wins; a link no route matches is ignored.
+  # match: host ("*." for any subdomain) and an optional path glob: "*" matches within one segment,
+  #   a closing "/**" matches the rest of the path.
+  # follow: whether a walk clicks through the link.
+  # expect: what must carry the key, one kind per entry:
+  #   {query: r}             the parameter r on the link
+  #   {query-if-present: r}  the same, but a link without r is not checked
+  #   {path-segment: n}      path segment n of the link, counted from 1
+  #   {cookie: name}         the cookie the landed page stores (needs follow: true)
+  #   {local-storage: name}  the local storage item the landed page stores (needs follow: true)
+  #   fail                   no link may lead here
+  routes:
+    # Site pages: if a link has r, it must be the visitor's key.
+    - name: site
+      match: [trustee.io, "*.trustee.io"]
+      follow: true
+      expect: [ { query-if-present: r } ]
+    # Branch links are never opened.
+    - name: branch-links
+      match: ["*.app.link", app.link, "*.branch.io", t.ki]
+      follow: false
+    # The referral link must carry the key in the first path segment.
+    - name: referral-link
+      match: [trusteeplus.app.link]
+      follow: false
+      expect: [ { path-segment: 1 } ]
+    # Direct store links bypass the referral.
+    - name: direct-store-link
+      match: [apps.apple.com, itunes.apple.com, play.google.com]
+      follow: false
+      expect: fail
+    # Banner install links without a referral key.
+    - name: banner-without-key
+      match: ["t.ki/banner*"]
+      follow: false
+      expect: fail
+  # Visitor paths. Steps:
+  #   enter          open the start page with the referral key
+  #   click          click one link
+  #   click*         click links any number of times, zero included
+  #   reload         reload the current page
+  #   enter-new-key  open the current page again with a different key
+  scenarios:
+    - { name: entry, steps: [enter] }
+    - { name: browse, steps: [enter, "click*"] }
+    - { name: key-replaced, steps: [enter, "click*", enter-new-key, "click*"] }
+    - { name: reload, steps: [enter, "click*", reload] }
+  # How often a page is walked on from again:
+  #   once-per-page     once, however it was reached
+  #   once-per-arrival  once per way of arriving: entered, entered with a new key, clicked with the key,
+  #                     clicked without it, redirected, reloaded
+  #   once-per-link     once per link leading to it; a page not reached by a click as in once-per-arrival
+  coverage: once-per-arrival
+  # Scheduled runs; ignored with --run-once.
+  schedule:
+    enabled: false
+    cron: "0 0 3 * * *"
+    zone: UTC

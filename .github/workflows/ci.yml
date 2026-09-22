@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - main
+      - 'feature/**'
+      # Deploy runs this workflow itself before it builds the image.
+      - '!feature/deploy'
+      - 'fix/**'
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Read the Playwright version
+        id: playwright
+        run: echo "version=$(grep -oPm1 '(?<=<playwright.version>)[^<]+' pom.xml)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache the browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      - name: Install the browsers
+        run: >
+          ./mvnw -B -DskipTests compile exec:java
+          -Dexec.classpathScope=compile
+          -Dexec.mainClass=com.microsoft.playwright.CLI
+          -Dexec.args="install --with-deps chromium webkit"
+
+      - name: Build and test
+        run: ./mvnw -B verify
+
+      - name: Upload the test reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports
+          path: |
+            target/surefire-reports/
+            target/failsafe-reports/
+          if-no-files-found: ignore
+          retention-days: 7

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fixture languages</title>
+  <style>
+    /* Built like the live site's language switcher: a modal that stays in the page, closed and parked
+       beside the screen, with the current language marked, and a selector at the foot of the page.
+       Every item leads to an ordinary page of the site, the page the visitor is on among them. */
+    body { margin: 0; font-family: sans-serif; overflow-x: hidden; }
+    .style_modal__Rt5kW { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff;
+      transform: translateX(100%); }
+    .style_modal--opened__Kp2sD { transform: none; }
+    .style_lang-modal__wR8nT ul { list-style: none; margin: 0; padding: 16px; }
+  </style>
+</head>
+<body>
+<main>
+  <a id="read-on" href="/plain">read on</a>
+  <a id="store" href="https://STORE_HOST/app">store page</a>
+</main>
+<aside class="style_modal__Rt5kW">
+  <div class="style_modal__content__Lm3Qe">
+    <div class="style_lang-modal__wR8nT">
+      <ul>
+        <li class="style_lang-link--selected__H7vXc"><a id="modal-uk" href="/languages">UK Українська</a></li>
+        <li class="style_lang-link__Tq9Za"><a id="modal-en" href="/plain">EN English</a></li>
+      </ul>
+    </div>
+  </div>
+</aside>
+<footer>
+  <div class="style_localization-selector__Vb4Nm">
+    <a id="footer-en" href="/plain">en</a>
+    <a id="footer-ru" href="/languages?lang=ru">ru</a>
+  </div>
+</footer>
+<script>
+  history.replaceState(null, '', location.href);
+</script>
+</body>
+</html>

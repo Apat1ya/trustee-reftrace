@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fixture font stuck</title>
+</head>
+<body>
+<a id="exit" href="EXIT_BASE/fontstuck/install">install</a>
+<a id="store" href="https://STORE_HOST/app">store page</a>
+<script>
+  history.replaceState(null, '', location.href);
+  // A font that never arrives: nothing ever answers /hang, so document.fonts.ready stays pending,
+  // the way WebKit leaves it after a click cancelled the font a hover had started loading.
+  addEventListener('load', () => {
+    const stuck = new FontFace('Stuck', 'url(/hang)');
+    document.fonts.add(stuck);
+    stuck.load().catch(() => {});
+  });
+</script>
+</body>
+</html>

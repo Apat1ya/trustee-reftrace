@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fixture stores</title>
+</head>
+<body>
+<a id="exit" href="EXIT_BASE/stores/install">install</a>
+<script>
+  // Keeps the key of the address the way a site that remembers its referrer would.
+  var key = new URLSearchParams(location.search).get('r');
+  document.cookie = 'ref=' + key + '; path=/';
+  window.localStorage.setItem('ref', key);
+  // The router pass every page of the live site goes through, which is what settling waits for.
+  history.replaceState(null, '', location.href);
+</script>
+</body>
+</html>

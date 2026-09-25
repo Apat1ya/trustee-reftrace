@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fixture exits a visitor cannot press</title>
+  <style>
+    html { scroll-behavior: smooth; }
+    body { margin: 0; font-family: sans-serif; }
+    .gone { display: none; }
+    .answer { height: 0; overflow: hidden; }
+    .banner { position: relative; }
+    .banner .cover { position: absolute; inset: 0; background: #fff; }
+    .tall { height: 1500px; }
+  </style>
+</head>
+<body>
+<a id="store" href="https://STORE_HOST/app">open the store</a>
+<div class="gone"><a id="gone" href="">install from the copy nobody sees</a></div>
+<a id="inert" href="" disabled style="pointer-events: none">order, not for now</a>
+<a id="dead" href="">install that goes nowhere</a>
+<div class="tall"></div>
+<!-- The way the live site's closed FAQ answer and a banner over a button keep a visitor out; a click
+     on either goes somewhere its href does not say, so a click that happened shows. -->
+<div class="answer"><p>The answer: <a id="clipped" href="">install from the closed answer</a></p></div>
+<div class="banner"><a id="covered" href="">install under the banner</a><div class="cover"></div></div>
+<script>
+  var base = 'EXIT_BASE';
+  var key = (location.search.match(/[?&]r=([^&]*)/) || ['', 'nokey'])[1];
+  var exit = function (what) {
+    return base + '/' + key + '/' + what + '/install';
+  };
+  ['gone', 'inert', 'dead', 'clipped', 'covered'].forEach(function (what) {
+    document.getElementById(what).href = exit(what);
+  });
+  document.getElementById('dead').addEventListener('click', function (event) {
+    event.preventDefault();
+  });
+  ['clipped', 'covered'].forEach(function (what) {
+    document.getElementById(what).addEventListener('click', function (event) {
+      event.preventDefault();
+      location.href = exit(what + '-script');
+    });
+  });
+  // The router pass every page of the live site goes through, which is what settling waits for.
+  history.replaceState(null, '', location.href);
+</script>
+</body>
+</html>

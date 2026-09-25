@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fixture home</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    nav[hidden] { display: none; }
+    .pop { display: none; }
+    .hoverwrap:hover .pop { display: block; }
+    .away { display: none; }
+  </style>
+</head>
+<body>
+<div id="shell">
+  <button id="burger" aria-expanded="false" aria-controls="drawer">Menu</button>
+  <nav id="drawer" hidden>
+    <a id="drawer-exit" href="">install from the drawer</a>
+  </nav>
+</div>
+<div class="hoverwrap" style="cursor: pointer">
+  <span>Show the code</span>
+  <div class="pop"><a id="pop-exit" href="">install from the code</a></div>
+</div>
+<div class="away">
+  <a id="away-exit" href="">the copy nobody sees</a>
+</div>
+<div id="app">loading</div>
+<img src="http://ANALYTICS_HOST/pixel.gif?event=view" alt="" width="1" height="1">
+<script>
+  var base = 'EXIT_BASE';
+  var key = (location.search.match(/[?&]r=([^&]*)/) || ['', 'nokey'])[1];
+  var exit = function (what) {
+    return base + '/' + key + '/' + what + '/install';
+  };
+  document.getElementById('drawer-exit').href = exit('drawer');
+  document.getElementById('pop-exit').href = exit('code');
+  document.getElementById('away-exit').href = exit('away');
+  document.getElementById('burger').addEventListener('click', function () {
+    var drawer = document.getElementById('drawer');
+    drawer.hidden = !drawer.hidden;
+  });
+
+  // First pass: the installer alone, the way the live site renders before its data arrives.
+  setTimeout(function () {
+    document.getElementById('app').innerHTML =
+      '<a id="apk" target="_blank" href="' + base + '/' + key + '/app-release.apk">get the file</a>'
+      + ' <a id="internal" href="/plain?r=' + key + '">read on</a>';
+  }, 120);
+
+  // Second pass: the store buttons. One of them carries the right address for a tenth of a second
+  // before changing its mind, which is what reading the page too early would have believed. The
+  // router replaces the address as the live site's does, so this pass is also a second navigation.
+  setTimeout(function () {
+    history.replaceState(null, '', location.href);
+    var app = document.getElementById('app');
+    var flash = document.createElement('a');
+    flash.id = 'flash';
+    flash.href = exit('store');
+    flash.textContent = 'open the store';
+    app.appendChild(flash);
+
+    var timer = document.createElement('a');
+    timer.id = 'timer';
+    timer.href = base + '/nokey/button/install';
+    timer.textContent = 'get the app';
+    timer.addEventListener('click', function (event) {
+      event.preventDefault();
+      setTimeout(function () {
+        location.href = exit('button');
+      }, 120);
+    });
+    app.appendChild(timer);
+
+    setTimeout(function () {
+      flash.href = 'https://STORE_HOST/app';
+    }, 100);
+  }, 400);
+</script>
+</body>
+</html>

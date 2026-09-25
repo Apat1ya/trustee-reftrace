@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fixture qr only</title>
+</head>
+<body>
+<!-- A desktop layout whose only way towards the app is a QR code: no store link anywhere, so the
+     page has to be finished by its code alone. -->
+<p>Point the camera of your phone at the code.</p>
+<div class="code" id="shown">QR_SHOWN</div>
+<div class="code" style="display: none">QR_HIDDEN</div>
+<p><a class="more" href="/redirect?r=qrkey">read on</a></p>
+<script>
+  history.replaceState(null, '', location.href);
+</script>
+</body>
+</html>

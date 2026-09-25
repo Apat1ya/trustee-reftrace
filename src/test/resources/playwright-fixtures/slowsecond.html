@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fixture slow second pass</title>
+</head>
+<body>
+<!-- Everything the first render pass of the live site offers, and nothing else: the file download,
+     a hard-coded content exit carrying somebody else's key, and a link decorated with this
+     visitor's key. A page read here looks finished and is wrong about every exit on it. -->
+<a id="apk" href="EXIT_BASE/app-release.apk">get the file</a>
+<a id="foreign" href="EXIT_BASE/someoneelse/install">install</a>
+<a id="internal" href="/plain?r=slowkey">read on</a>
+<div id="app"></div>
+<script>
+  var key = (location.search.match(/[?&]r=([^&]*)/) || ['', 'nokey'])[1];
+  document.getElementById('internal').href = '/plain?r=' + key;
+
+  // The second pass arrives a long second later, as measured on the live site.
+  setTimeout(function () {
+    history.replaceState(null, '', location.href);
+    document.getElementById('app').innerHTML =
+      '<a id="store" href="https://STORE_HOST/app?r=' + key + '">open the store</a>';
+  }, 1200);
+</script>
+</body>
+</html>

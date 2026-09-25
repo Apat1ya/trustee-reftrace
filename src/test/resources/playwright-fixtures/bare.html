@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fixture bare</title>
+</head>
+<body>
+<!-- A page with no way towards the app at all, only links further into the site. -->
+<nav>
+  <a href="/plain?r=barekey">plain</a>
+  <a href="/home?r=barekey">home</a>
+</nav>
+<script>
+  history.replaceState(null, '', location.href);
+</script>
+</body>
+</html>

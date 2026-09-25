@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fixture steps</title>
+  <style>
+    /* The ways the live site keeps a link from a visitor's pointer, next to the ways it keeps a link
+       from the visitor altogether: the copy of the navigation meant for another screen size is out of
+       the layout, the phone menu is laid out beside the screen, a closed answer clips its links to
+       nothing, a dialog lies over the page, a list slides the whole time, a link waits far below the
+       screen of a page that scrolls smoothly. */
+    html { scroll-behavior: smooth; }
+    body { margin: 0; font-family: sans-serif; overflow-x: hidden; }
+    .desktop-nav { display: none; }
+    .drawer { position: fixed; top: 0; left: 0; width: 300px; transform: translateX(-100%); }
+    .answer { height: 0; overflow: hidden; }
+    .banner { position: relative; }
+    .banner .cover { position: absolute; inset: 0; background: #fff; }
+    .moving { display: inline-block; animation: slide 0.4s linear infinite alternate; }
+    @keyframes slide { from { transform: translateX(0); } to { transform: translateX(200px); } }
+    .faded { opacity: 0; }
+    .invisible { visibility: hidden; }
+    .tall { height: 3000px; }
+  </style>
+</head>
+<body>
+<nav class="desktop-nav">
+  <a id="desktop-copy" href="/plain?from=drawer">Drawer</a>
+  <a id="desktop-only" href="/plain?from=desktop-only">Desktop only</a>
+</nav>
+<div class="drawer"><a id="drawer" href="/plain?from=drawer">Drawer</a></div>
+<main>
+  <p><a id="shown" href="/plain?from=shown">Shown</a></p>
+  <div class="banner"><a id="covered" href="/plain?from=covered">Covered</a><div class="cover"></div></div>
+  <div class="answer"><p><a id="clipped" href="/plain?from=clipped">Clipped</a></p></div>
+  <p><a id="moving" class="moving" href="/plain?from=moving">Moving</a></p>
+  <p><a id="faded" class="faded" href="/plain?from=faded">Faded</a></p>
+  <p><a id="invisible" class="invisible" href="/plain?from=invisible">Invisible</a></p>
+  <details><summary>More</summary><a id="folded" href="/plain?from=folded">Folded</a></details>
+  <p><a id="inert" href="/plain?from=inert">Goes nowhere</a></p>
+  <a id="store" href="https://STORE_HOST/app">store page</a>
+  <div class="tall"></div>
+  <p><a id="far" href="/plain?from=far">Far below</a></p>
+</main>
+<script>
+  document.getElementById('inert').addEventListener('click', function (event) {
+    event.preventDefault();
+  });
+  // A visitor has the link on screen when pressing it; pressed anywhere else, it goes elsewhere.
+  document.getElementById('far').addEventListener('click', function (event) {
+    var box = this.getBoundingClientRect();
+    if (box.top < 0 || box.bottom > window.innerHeight) {
+      event.preventDefault();
+      location.href = '/plain?from=far-off-screen';
+    }
+  });
+  history.replaceState(null, '', location.href);
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fixture banner</title>
+</head>
+<body>
+<!-- A sticky banner and nothing else towards the app. With a key it leads to a whole host the rules
+     stop; without one it falls back to a path the rules stop, as the site's banner does before it has
+     read the key. -->
+<a id="banner" href="#">Install the app</a>
+<script>
+  const key = new URLSearchParams(location.search).get('r');
+  document.getElementById('banner').href = key ? 'https://STORE_HOST/banner/' + key : 'EXIT_BASE/banner';
+  history.replaceState(null, '', location.href);
+</script>
+</body>
+</html>

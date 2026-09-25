@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fixture burger</title>
+  <style>
+    /* Built like the live site's phone header: the menu is laid out in full but parked beside the
+       screen until the burger slides it in, and a submenu has no size until its arrow is clicked.
+       None of the controls is a button or says what it does; the site answers clicks on plain divs. */
+    body { margin: 0; font-family: sans-serif; overflow-x: hidden; }
+    header { position: sticky; top: 0; height: 56px; background: #222; }
+    .style_togglers__pYCLp { position: absolute; right: 16px; top: 12px; }
+    .style_burger__33hUz { width: 32px; height: 32px; background: #fff; }
+    .style_mobile-menu__EyoeM { position: absolute; top: 56px; left: 0; width: 100%; height: 700px;
+      background: #fff; transform: translateX(-100%); transition: transform 0.2s; }
+    .style_mobile-menu--opened__Q1w2E { transform: none; }
+    .style_mobile-menu__wrapper__NvnHQ { list-style: none; margin: 0; padding: 16px; }
+    .style_content__wrapper__Na6Zl { position: relative; height: 48px; }
+    .style_mobile-first-level__arrow__bLouL { position: absolute; right: 0; top: 16px; width: 24px;
+      height: 16px; background: #999; }
+    .style_nav-list__CxzuY { display: none; }
+    .style_nav-list--opened__Xy7Uq { display: block; }
+  </style>
+</head>
+<body>
+<header>
+  <a class="style_brand___2euJ" href="/burger">brand</a>
+  <div class="style_togglers__pYCLp">
+    <div class="style_burger__33hUz" id="burger"></div>
+  </div>
+  <div class="style_mobile-menu__EyoeM" id="menu">
+    <ul class="style_mobile-menu__wrapper__NvnHQ">
+      <div><div class="style_content__wrapper__Na6Zl">
+        <a class="style_mobile-menu__title__vCj3Q" id="academy" href="">Academy</a>
+      </div></div>
+      <div><div class="style_content__wrapper__Na6Zl">
+        <a class="style_mobile-menu__title__vCj3Q" id="wallet" href="">Wallet</a>
+        <div class="style_mobile-first-level__arrow__bLouL"></div>
+      </div></div>
+      <ul class="style_nav-list__CxzuY">
+        <li><a id="staking" href="">Staking</a></li>
+      </ul>
+      <div><div class="style_content__wrapper__Na6Zl">
+        <a class="style_mobile-menu__title__vCj3Q" id="rates" href="">Rates</a>
+        <div class="style_mobile-first-level__arrow__bLouL"></div>
+      </div></div>
+      <ul class="style_nav-list__CxzuY">
+        <li><a id="btc" href="">Bitcoin rate</a></li>
+      </ul>
+    </ul>
+  </div>
+</header>
+<main>
+  <a id="store" href="https://STORE_HOST/app">store page</a>
+</main>
+<script>
+  var key = (location.search.match(/[?&]r=([^&]*)/) || ['', 'nokey'])[1];
+  document.getElementById('academy').href = '/plain?r=' + key + '&from=menu';
+  document.getElementById('wallet').href = '/plain?r=' + key + '&from=wallet';
+  document.getElementById('staking').href = '/plain?r=' + key + '&from=submenu';
+  document.getElementById('rates').href = '/plain?r=' + key + '&from=rates';
+  document.getElementById('btc').href = '/plain?r=' + key + '&from=btc';
+  document.getElementById('burger').addEventListener('click', function () {
+    document.getElementById('menu').classList.toggle('style_mobile-menu--opened__Q1w2E');
+  });
+  document.querySelectorAll('.style_mobile-first-level__arrow__bLouL').forEach(function (arrow) {
+    arrow.addEventListener('click', function () {
+      arrow.parentElement.parentElement.nextElementSibling.classList.toggle('style_nav-list--opened__Xy7Uq');
+    });
+  });
+  history.replaceState(null, '', location.href);
+</script>
+</body>
+</html>

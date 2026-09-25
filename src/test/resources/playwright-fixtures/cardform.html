@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fixture card form</title>
+  <style>
+    /* Built like the live card page: an address asking for the order form opens it over the whole
+       page, above everything, and only its own close button takes it away again; Escape does not.
+       The other dialogs of the page sit closed in the markup with close buttons of their own. */
+    body { margin: 0; font-family: sans-serif; }
+    .style_modal__7QxGf { display: none; position: fixed; inset: 0; z-index: 99999; background: #fff; }
+    .style_modal--opened__SraE4 { display: block; }
+    .style_modal__header__DrlTL { display: flex; justify-content: space-between; padding: 16px; }
+    .style_modal__close__AluHi { width: 24px; height: 24px; }
+  </style>
+</head>
+<body>
+<main>
+  <a id="exit" href="">get the card in the app</a>
+  <a id="store" href="https://STORE_HOST/app">store page</a>
+</main>
+<aside class="style_modal__7QxGf" id="card-form">
+  <div class="style_modal__header__DrlTL">
+    <span>Pre-order your physical card!</span>
+    <button class="style_modal__close__AluHi" id="close-card-form"></button>
+  </div>
+  <form class="style_modal__form__YR7VV" onsubmit="return false">
+    <label>Phone number <input type="tel" name="phone"></label>
+    <button type="button">Confirm</button>
+  </form>
+</aside>
+<aside class="style_modal__7QxGf" id="other-form">
+  <div class="style_modal__header__DrlTL">
+    <span>Another form nobody asked for</span>
+    <button class="style_modal__close__AluHi"></button>
+  </div>
+  <form class="style_modal__form__iKOh3" onsubmit="return false">
+    <label>Email <input type="email" name="email"></label>
+  </form>
+</aside>
+<script>
+  var key = (location.search.match(/[?&]r=([^&]*)/) || ['', 'nokey'])[1];
+  document.getElementById('exit').href = 'EXIT_BASE/' + key + '/card/install';
+  if (/[?&]physical-card-form=open/.test(location.search)) {
+    document.getElementById('card-form').classList.add('style_modal--opened__SraE4');
+  }
+  document.querySelectorAll('.style_modal__close__AluHi').forEach(function (close) {
+    close.addEventListener('click', function () {
+      close.closest('aside').classList.remove('style_modal--opened__SraE4');
+    });
+  });
+  // The router drops the query that opened the form, as the live site's does.
+  history.replaceState(null, '', location.pathname);
+</script>
+</body>
+</html>

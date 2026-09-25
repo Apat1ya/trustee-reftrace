@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fixture beacon</title>
+</head>
+<body>
+<a id="beacon" href="EXIT_BASE/nokey/beacon/install">get the app</a>
+<a id="store" href="https://STORE_HOST/app">store page</a>
+<script>
+  // Like the site's attribution SDK: the click first reports itself to another exit host, and only
+  // then sends the visitor where the link really goes.
+  document.getElementById('beacon').addEventListener('click', function (event) {
+    event.preventDefault();
+    new Image().src = 'https://api.appexit.invalid/v1/open?link=beacon';
+    setTimeout(function () {
+      location.href = 'EXIT_BASE/beaconkey/beacon/install';
+    }, 150);
+  });
+  history.replaceState(null, '', location.href);
+</script>
+</body>
+</html>

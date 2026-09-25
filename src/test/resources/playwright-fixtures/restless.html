@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fixture restless</title>
+</head>
+<body>
+<a id="exit" href="EXIT_BASE/0/install">install</a>
+<script>
+  // A page that never makes up its mind. Waiting for it to stand still has to end on the cap.
+  var round = 0;
+  setInterval(function () {
+    round = round + 1;
+    document.getElementById('exit').href = 'EXIT_BASE/' + round + '/install';
+  }, 150);
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Fixture early store link</title>
+</head>
+<body>
+<!-- A page whose first render pass already shows a store link, without the visitor's key, and then
+     stands still for longer than the quiet period until the router passes. Phase two rewrites the
+     links a little after the router's replace, as measured on the live site. -->
+<div id="app"><a id="store" href="https://STORE_HOST/app">open the store</a></div>
+<script>
+  var key = (location.search.match(/[?&]r=([^&]*)/) || ['', 'nokey'])[1];
+  setTimeout(function () {
+    history.replaceState(null, '', location.href);
+    setTimeout(function () {
+      document.getElementById('store').href = 'https://STORE_HOST/app?r=' + key;
+    }, 150);
+  }, 800);
+</script>
+</body>
+</html>

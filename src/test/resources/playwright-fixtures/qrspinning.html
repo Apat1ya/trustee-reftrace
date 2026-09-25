@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fixture qrspinning</title>
+  <style>
+    /* Like the site's coins: a square picture that turns for as long as the page is open. */
+    .coin { width: 120px; height: 120px; margin: 24px; animation: spin 2s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spacer { height: 1200px; }
+    .box { width: 200px; height: 200px; margin: 24px; }
+  </style>
+</head>
+<body>
+<a id="store" href="https://STORE_HOST/app">store page</a>
+<canvas class="coin" width="120" height="120"></canvas>
+<!-- Below the fold: it has to be scrolled to before it can be photographed. -->
+<div class="spacer"></div>
+<div class="box" id="shown">QR_SHOWN</div>
+<script>
+  const coin = document.querySelector('.coin').getContext('2d');
+  coin.fillStyle = '#e8a33d';
+  coin.beginPath();
+  coin.arc(60, 60, 56, 0, 2 * Math.PI);
+  coin.fill();
+  history.replaceState(null, '', location.href);
+</script>
+</body>
+</html>

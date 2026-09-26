@@ -1,0 +1,93 @@
+name: Deploy
+
+# Runs CI, builds the image, pushes it to GHCR and restarts the test stand with it.
+#
+# Secrets: DEPLOY_HOST, DEPLOY_SSH_KEY (private key of a user in the docker group, ubuntu by default),
+# REPORTS_PASSWORD (basic auth for the reports), TELEGRAM_BOT_TOKEN (the bot that sends the alerts).
+# Variables: SITE_ADDRESS (the host name the reports are served on), TELEGRAM_CHAT_ID (the chat the
+# alerts go to); optional DEPLOY_USER, PARALLEL_BROWSERS.
+# The stand itself is in .github/deploy, the steps on the host in .github/scripts/deploy.sh.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  IMAGE: ghcr.io/apat1ya/trustee-reftrace
+
+jobs:
+  ci:
+    name: CI
+    uses: ./.github/workflows/ci.yml
+
+  build-and-push:
+    name: Build and push the image
+    needs: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Set up Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE }}:${{ github.sha }}
+            ${{ env.IMAGE }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Deploy to the test stand
+    needs: build-and-push
+    environment:
+      name: stand
+      url: https://${{ vars.SITE_ADDRESS }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Set up SSH
+        run: |
+          install -m 700 -d ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy
+        env:
+          TARGET: ${{ vars.DEPLOY_USER || 'ubuntu' }}@${{ secrets.DEPLOY_HOST }}
+          IMAGE: ${{ env.IMAGE }}:${{ github.sha }}
+          SITE_ADDRESS: ${{ vars.SITE_ADDRESS }}
+          PARALLEL_BROWSERS: ${{ vars.PARALLEL_BROWSERS }}
+          REPORTS_PASSWORD: ${{ secrets.REPORTS_PASSWORD }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: .github/scripts/deploy.sh

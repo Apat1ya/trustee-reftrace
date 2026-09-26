@@ -1,0 +1,25 @@
+apiVersion: 1
+
+# The traces of the monitor, one per page visit. The time per stage is asked with TraceQL
+# metrics (Explore, or Drilldown > Traces), which Tempo answers from its local blocks.
+datasources:
+  - name: Tempo
+    uid: reftrace-tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    isDefault: true
+    editable: false
+    jsonData:
+      streamingEnabled:
+        search: true
+        metrics: true
+      nodeGraph:
+        enabled: true
+      search:
+        hide: false
+      traceQuery:
+        # A trace looked up by id is searched for over the whole retention.
+        timeShiftEnabled: false
+        spanStartTimeShift: -1h
+        spanEndTimeShift: 1h

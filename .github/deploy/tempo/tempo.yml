@@ -1,0 +1,56 @@
+# Single-process Tempo on the local filesystem. The monitor sends one trace per
+# page visit over OTLP/HTTP to tempo:4318, inside the compose network only;
+# Grafana reads them on tempo:3200. The time per stage is asked with TraceQL
+# metrics, which local-blocks serves; nothing goes from here to Prometheus.
+stream_over_http_enabled: true
+
+server:
+  http_listen_port: 3200
+  log_level: warn
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        http:
+          endpoint: 0.0.0.0:4318
+
+ingester:
+  # A visit's trace is complete within a minute; blocks are cut every few minutes
+  # so that search reaches them soon.
+  max_block_duration: 5m
+
+compactor:
+  compaction:
+    # A week; the stand's disk is small.
+    block_retention: 168h
+
+metrics_generator:
+  # Needed for the generator to run at all, though nothing is written to a Prometheus.
+  storage:
+    path: /var/tempo/generator/wal
+  traces_storage:
+    path: /var/tempo/generator/traces
+  processor:
+    local_blocks:
+      # The monitor's spans are internal spans; by default only server spans are kept.
+      filter_server_spans: false
+      flush_to_storage: true
+
+storage:
+  trace:
+    backend: local
+    wal:
+      path: /var/tempo/wal
+    local:
+      path: /var/tempo/blocks
+
+overrides:
+  defaults:
+    metrics_generator:
+      processors: [local-blocks]
+
+query_frontend:
+  metrics:
+    # TraceQL metrics over the whole retention; the default is 3h, less than one run.
+    max_duration: 744h

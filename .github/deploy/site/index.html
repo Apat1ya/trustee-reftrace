@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>reftrace</title>
+<style>
+  :root { --bg: #f6f7f9; --card: #fff; --text: #1b1f24; --muted: #667085; --line: #e3e6ea; --accent: #2563eb; --ok: #15803d; --warn: #b45309; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #111418; --card: #1a1e24; --text: #e6e8eb; --muted: #9aa3ae; --line: #2a3038; --accent: #6ea8fe; --ok: #4ade80; --warn: #fbbf24; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 720px; margin: 0 auto; padding: 48px 16px; }
+  h1 { margin: 0 0 4px; font-size: 28px; }
+  .lead { margin: 0 0 32px; color: var(--muted); }
+  .card { display: block; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 20px; margin-bottom: 12px; color: inherit; text-decoration: none; }
+  a.card:hover { border-color: var(--accent); }
+  .card h2 { margin: 0 0 6px; font-size: 18px; }
+  .card p { margin: 0; color: var(--muted); }
+  .card a { color: var(--accent); }
+  .ok { color: var(--ok); } .warn { color: var(--warn); }
+</style>
+</head>
+<body>
+<main>
+  <h1>reftrace</h1>
+  <p class="lead">Daily check that the referral key from trustee.io reaches the App Store and Google Play links.</p>
+
+  <section class="card" id="latest">
+    <h2>Latest run</h2>
+    <p>Loading…</p>
+  </section>
+
+  <a class="card" href="/grafana/d/reftrace-run">
+    <h2>Run results</h2>
+    <p>What a run found, page by page: the links that lost the referral key, what could not be checked, and how the runs of the last two weeks ended.</p>
+  </a>
+
+  <a class="card" href="/grafana/d/reftrace-monitor">
+    <h2>Monitor health</h2>
+    <p>Whether the daily check runs, when it last ended, whether it can be trusted and what it found.</p>
+  </a>
+
+  <a class="card" href="/alertmanager/">
+    <h2>Alerts</h2>
+    <p>What is wrong with the monitor right now: a missed or stuck run, one that says nothing about the site.</p>
+  </a>
+
+  <a class="card" href="/grafana/a/grafana-exploretraces-app/explore?from=now-7d&amp;to=now&amp;var-ds=reftrace-tempo&amp;var-primarySignal=nestedSetParent%3C0&amp;var-metric=duration&amp;actionView=traces">
+    <h2>Visit traces</h2>
+    <p>Where the time of a run goes: one trace per page visit, with its steps and page stages.</p>
+  </a>
+
+  <a class="card" href="/reports/">
+    <h2>Report files</h2>
+    <p>Every run's report.json and traces as files, newest last.</p>
+  </a>
+
+  <a class="card" href="/prometheus/alerts">
+    <h2>Metrics and alert rules</h2>
+    <p>The monitor's metrics in Prometheus and the alert rules on them.</p>
+  </a>
+</main>
+<script>
+  // Run directories are named <UTC time>-<id>, e.g. 20260922T131229Z-1724, so the name sorts by time.
+  const card = document.querySelector('#latest p');
+  const when = name => {
+    const m = /^(\d{4})(\d\d)(\d\d)T(\d\d)(\d\d)(\d\d)Z/.exec(name);
+    return m ? new Date(Date.UTC(m[1], m[2] - 1, m[3], m[4], m[5], m[6])) : null;
+  };
+  const list = url => fetch(url, { headers: { Accept: 'application/json' } })
+    .then(r => r.ok ? r.json() : Promise.reject(new Error(r.status)))
+    // Caddy answers an empty directory with null.
+    .then(entries => entries ?? []);
+
+  list('/reports/').then(async entries => {
+    const runs = entries.filter(e => e.is_dir && when(e.name)).map(e => e.name.replace(/\/$/, '')).sort();
+    if (!runs.length) { card.textContent = 'No run yet. The monitor runs once a day.'; return; }
+    const run = runs[runs.length - 1];
+    const started = when(run);
+    const files = await list(`/reports/${run}/`);
+    const done = files.some(f => f.name === 'report.json');
+    card.innerHTML = '';
+    const line = document.createElement('span');
+    line.textContent = `Started ${started.toISOString().replace('T', ' ').slice(0, 16)} UTC · `;
+    const status = document.createElement('span');
+    status.className = done ? 'ok' : 'warn';
+    status.textContent = done ? 'report written' : 'running, or ended without a report';
+    card.append(line, status, document.createElement('br'));
+    const link = document.createElement('a');
+    link.href = done ? `/reports/${run}/report.json` : `/reports/${run}/`;
+    link.textContent = done ? 'Open the report' : 'Open the run directory';
+    card.append(link);
+  }).catch(e => { card.textContent = `Could not read the runs (${e.message}).`; });
+</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+{
+	# Only 443 is open: no HTTP listener, certificates come through the TLS-ALPN challenge.
+	auto_https disable_redirects
+}
+
+# A host name gets a Let's Encrypt certificate; a bare IP gets one from Caddy's own CA.
+{$SITE_ADDRESS}:443 {
+	basic_auth {
+		{$REPORTS_USER} {$REPORTS_PASSWORD_HASH}
+	}
+
+	# One directory per run, mounted at /srv/reports so the listing shows the /reports/ path;
+	# the start page reads this listing as JSON to find the latest run.
+	redir /reports /reports/
+	handle /reports/* {
+		root * /srv
+		file_server browse
+	}
+
+	# Grafana serves itself from /grafana/. The credentials of the basic auth above are not
+	# Grafana's, so they are not passed on: inside, everyone is the anonymous Admin.
+	redir /grafana /grafana/
+	handle /grafana/* {
+		reverse_proxy grafana:3000 {
+			header_up -Authorization
+		}
+	}
+
+	# Prometheus and Alertmanager answer at their root inside the network and know from
+	# --web.external-url that people reach them under these prefixes; the prefix is taken off here.
+	redir /prometheus /prometheus/
+	handle_path /prometheus/* {
+		reverse_proxy prometheus:9090 {
+			header_up -Authorization
+		}
+	}
+
+	redir /alertmanager /alertmanager/
+	handle_path /alertmanager/* {
+		reverse_proxy alertmanager:9093 {
+			header_up -Authorization
+		}
+	}
+
+	handle {
+		root * /srv/site
+		file_server
+	}
+}
+
+# The run folders once more, for Grafana's run dashboard: its Infinity data source reads the list
+# of runs (a directory asked for with "Accept: application/json" comes back as a JSON listing) and
+# each run's report.json from here. Inside the compose network only: compose publishes no port
+# for it, so from outside there is still nothing but the site above and its basic auth.
+http://:8088 {
+	root * /srv/reports
+	file_server browse
+}

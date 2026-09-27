@@ -1,0 +1,260 @@
+# Unit tests for reftrace-alerts.yml, run from this directory:
+#
+#   promtool test rules reftrace-alerts.test.yml
+#
+# Each alert is set off once and kept quiet once, because a rule that never fires and one that always
+# fires look the same until something goes wrong; the two rules whose `for` matters are also checked
+# just before and after it. promtool compares the annotations of a firing alert in full, so a
+# reworded description has to be changed here too.
+#
+# In a promtool test the clock starts at Unix time 0, so time() is the evaluation time. The 26-hour
+# rules are evaluated at 27h over series a little longer than that.
+
+rule_files:
+  - reftrace-alerts.yml
+
+evaluation_interval: 1m
+
+tests:
+
+  # ---------------------------------------------------------------------------------- down
+  - name: the pushes stop
+    interval: 1m
+    input_series:
+      # Pushed at 0, 1 and 2 minutes, then nothing: gone from 7m on, when the lookback passes.
+      - series: 'process_uptime_milliseconds{job="trustee-reftrace", instance="a"}'
+        values: '0 60000 120000'
+    alert_rule_test:
+      - eval_time: 11m
+        alertname: ReftraceDown
+        exp_alerts: []
+      - eval_time: 13m
+        alertname: ReftraceDown
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              job: trustee-reftrace
+            exp_annotations:
+              summary: The referral monitor is not running
+              description: >-
+                No metrics have arrived from the monitor for ten minutes, so nothing is checking the
+                referral links. On the stand, see whether the container runs and what it logged last:
+                "cd ~/reftrace && docker compose ps" and "docker compose logs --tail=200 reftrace".
+
+  - name: the pushes keep coming
+    interval: 1m
+    input_series:
+      - series: 'process_uptime_milliseconds{job="trustee-reftrace", instance="a"}'
+        values: '0+60000x20'
+    alert_rule_test:
+      - eval_time: 15m
+        alertname: ReftraceDown
+        exp_alerts: []
+
+  # --------------------------------------------------------------- no successful run in 26 h
+  - name: the last success is older than 26 hours, from a process that has restarted since
+    interval: 1m
+    input_series:
+      # Process a ended a run with a report at Unix second 1000 and was replaced after 3 hours by
+      # process b, which never ended one.
+      - series: 'reftrace_run_last_finish_timestamp_seconds{job="trustee-reftrace", instance="a"}'
+        values: '1000+0x180'
+      - series: 'reftrace_run_last_status{job="trustee-reftrace", instance="a", status="no_report"}'
+        values: '0+0x180'
+      - series: 'process_uptime_milliseconds{job="trustee-reftrace", instance="b"}'
+        values: '0+60000x1700'
+    alert_rule_test:
+      - eval_time: 5h
+        alertname: ReftraceNoSuccessfulRun26h
+        exp_alerts: []
+      # 26 hours after the success, but within the 15 minutes of `for`.
+      - eval_time: 26h25m
+        alertname: ReftraceNoSuccessfulRun26h
+        exp_alerts: []
+      - eval_time: 27h
+        alertname: ReftraceNoSuccessfulRun26h
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+            exp_annotations:
+              summary: No referral check with a report in the last 26 hours
+              description: >-
+                The daily check should end with a report every 24 hours; the last one that did ended
+                more than 26 hours ago. Either the run was missed or the runs since ended without a
+                report. Look at "Last run" on the Reftrace monitor dashboard, then read the monitor's
+                log around the time of the last run.
+      # There was a success in the window, so this is not the never-ran case.
+      - eval_time: 27h
+        alertname: ReftraceNoSuccessfulRunEver
+        exp_alerts: []
+
+  - name: a run ended without a report after a success in the last day
+    interval: 1m
+    input_series:
+      - series: 'reftrace_run_last_finish_timestamp_seconds{job="trustee-reftrace", instance="a"}'
+        values: '1000+0x120 90000+0x1580'
+      - series: 'reftrace_run_last_status{job="trustee-reftrace", instance="a", status="no_report"}'
+        values: '0+0x120 1+0x1580'
+    alert_rule_test:
+      # The success at second 1000 is less than 26 hours old at 26h, older at 27h.
+      - eval_time: 26h
+        alertname: ReftraceNoSuccessfulRun26h
+        exp_alerts: []
+
+  # ------------------------------------------------------------------------------ never ran
+  - name: up for more than a day and no run ended with a report
+    interval: 1m
+    input_series:
+      - series: 'process_uptime_milliseconds{job="trustee-reftrace", instance="a"}'
+        values: '0+60000x1700'
+      - series: 'reftrace_run_last_finish_timestamp_seconds{job="trustee-reftrace", instance="a"}'
+        values: '3000+0x1650'
+      - series: 'reftrace_run_last_status{job="trustee-reftrace", instance="a", status="no_report"}'
+        values: '1+0x1650'
+    alert_rule_test:
+      - eval_time: 20h
+        alertname: ReftraceNoSuccessfulRunEver
+        exp_alerts: []
+      - eval_time: 27h
+        alertname: ReftraceNoSuccessfulRunEver
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+            exp_annotations:
+              summary: No referral check has ended with a report for as long as the monitor has been up
+              description: >-
+                The monitor has been running for more than 26 hours and none of its runs ended with a
+                report. Check that the schedule is on (REFTRACE_SCHEDULE_ENABLED) and whether the
+                container keeps restarting before the run comes around, then read the log of the last
+                run.
+      - eval_time: 27h
+        alertname: ReftraceNoSuccessfulRun26h
+        exp_alerts: []
+
+  # ---------------------------------------------------------------------- not trustworthy
+  - name: a run without a report, and one where the monitor failed a fifth of its checks
+    interval: 1m
+    input_series:
+      - series: 'reftrace_run_last_status{job="trustee-reftrace", instance="a", status="no_report"}'
+        values: '1+0x20'
+      - series: 'reftrace_run_last_status{job="trustee-reftrace", instance="a", status="ok"}'
+        values: '0+0x20'
+      # Its checks are those of the run before, which had a report: not a second alert for a.
+      - series: 'reftrace_run_last_checks{job="trustee-reftrace", instance="a", outcome="failed", profile="p"}'
+        values: '50+0x20'
+      - series: 'reftrace_run_last_checks{job="trustee-reftrace", instance="a", outcome="pass", profile="p"}'
+        values: '50+0x20'
+      - series: 'reftrace_run_last_status{job="trustee-reftrace", instance="b", status="no_report"}'
+        values: '0+0x20'
+      - series: 'reftrace_run_last_checks{job="trustee-reftrace", instance="b", outcome="failed", profile="p"}'
+        values: '20+0x20'
+      - series: 'reftrace_run_last_checks{job="trustee-reftrace", instance="b", outcome="pass", profile="p"}'
+        values: '80+0x20'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: ReftraceRunNotTrustworthy
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              job: trustee-reftrace
+              instance: a
+              status: no_report
+            exp_annotations:
+              summary: The last referral check says nothing about the site
+              description: >-
+                The last run ended as no_report: no_report means it stopped without writing a report,
+                degraded means the monitor itself failed more than one check in ten. Either way its
+                result is "could not tell", not "the site is fine". Read the monitor's log for that
+                run; if the cause was a one-off, the next night's run clears this.
+          - exp_labels:
+              severity: critical
+              job: trustee-reftrace
+              instance: b
+              status: degraded
+            exp_annotations:
+              summary: The last referral check says nothing about the site
+              description: >-
+                The last run ended as degraded: no_report means it stopped without writing a report,
+                degraded means the monitor itself failed more than one check in ten. Either way its
+                result is "could not tell", not "the site is fine". Read the monitor's log for that
+                run; if the cause was a one-off, the next night's run clears this.
+
+  - name: a run with a report where the monitor failed few checks
+    interval: 1m
+    input_series:
+      - series: 'reftrace_run_last_status{job="trustee-reftrace", instance="a", status="no_report"}'
+        values: '0+0x20'
+      - series: 'reftrace_run_last_checks{job="trustee-reftrace", instance="a", outcome="failed", profile="p"}'
+        values: '5+0x20'
+      - series: 'reftrace_run_last_checks{job="trustee-reftrace", instance="a", outcome="mismatch", profile="p"}'
+        values: '30+0x20'
+      - series: 'reftrace_run_last_checks{job="trustee-reftrace", instance="a", outcome="pass", profile="p"}'
+        values: '65+0x20'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: ReftraceRunNotTrustworthy
+        exp_alerts: []
+
+  # --------------------------------------------------------------------------------- stuck
+  - name: a run started more than seven hours ago and has not ended
+    interval: 1m
+    input_series:
+      - series: 'reftrace_run_last_start_timestamp_seconds{job="trustee-reftrace", instance="a"}'
+        values: '1000+0x600'
+    alert_rule_test:
+      - eval_time: 8h
+        alertname: ReftraceRunStuck
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              job: trustee-reftrace
+              instance: a
+            exp_annotations:
+              summary: A referral check has been running for more than seven hours
+              description: >-
+                A run started more than seven hours ago and has not ended, past its own six-hour limit,
+                so it is almost certainly stuck rather than working, and today's result will not arrive
+                by itself. Restart the monitor: "cd ~/reftrace && docker compose restart reftrace".
+
+  - name: the last run started more than seven hours ago and ended
+    interval: 1m
+    input_series:
+      - series: 'reftrace_run_last_start_timestamp_seconds{job="trustee-reftrace", instance="a"}'
+        values: '1000+0x600'
+      - series: 'reftrace_run_last_finish_timestamp_seconds{job="trustee-reftrace", instance="a"}'
+        values: '2000+0x600'
+    alert_rule_test:
+      - eval_time: 8h
+        alertname: ReftraceRunStuck
+        exp_alerts: []
+
+  # -------------------------------------------------------------------------------- coverage
+  - name: the last run visited half the pages of the run before
+    interval: 1m
+    input_series:
+      - series: 'reftrace_run_last_pages{job="trustee-reftrace", instance="a"}'
+        values: '100+0x120 50+0x60'
+    alert_rule_test:
+      - eval_time: 3h
+        alertname: ReftraceCoverageDropped
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              job: trustee-reftrace
+            exp_annotations:
+              summary: The referral check visited far fewer pages than usual
+              description: >-
+                The last run visited 50 distinct pages, less than 70 percent of the most of the past
+                week. The monitor can look healthy while it tests only part of the site. Compare
+                "Pages" on the Reftrace monitor dashboard with the days before, and look at the start
+                pages and the sitemap in the run's report before trusting its result.
+
+  - name: the last run visited a few pages less than the run before
+    interval: 1m
+    input_series:
+      - series: 'reftrace_run_last_pages{job="trustee-reftrace", instance="a"}'
+        values: '100+0x120 90+0x60'
+    alert_rule_test:
+      - eval_time: 3h
+        alertname: ReftraceCoverageDropped
+        exp_alerts: []

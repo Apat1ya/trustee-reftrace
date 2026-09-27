@@ -1,0 +1,60 @@
+# Alerts of the monitor on the test stand. They are shown in the Alertmanager UI and sent to a
+# Telegram chat when they fire and when they resolve.
+#
+# Neither the bot token nor the chat id is in the repository: the deploy writes them from the
+# TELEGRAM_BOT_TOKEN secret and the TELEGRAM_CHAT_ID variable to files only Alertmanager may read,
+# and compose.yml mounts them.
+
+route:
+  receiver: stand
+  # One notification per alert, not one per process of the monitor.
+  group_by: [alertname]
+  group_wait: 1m
+  group_interval: 10m
+  # What is wrong with a once-a-day check stays wrong until someone acts; repeating it more often
+  # only teaches people to ignore it.
+  repeat_interval: 24h
+  routes:
+    # The check is not happening or cannot be trusted: someone has to look today.
+    - matchers:
+        - severity = "critical"
+      receiver: stand
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 6h
+
+inhibit_rules:
+  # A monitor that is not running has nothing current to say: one alert about it, not one per rule.
+  - source_matchers:
+      - alertname = "ReftraceDown"
+    target_matchers:
+      - alertname =~ "ReftraceRunNotTrustworthy|ReftraceRunStuck|ReftraceCoverageDropped"
+
+  # A run that says nothing about the site has no coverage worth comparing either.
+  - source_matchers:
+      - alertname = "ReftraceRunNotTrustworthy"
+    target_matchers:
+      - alertname = "ReftraceCoverageDropped"
+
+receivers:
+  - name: stand
+    telegram_configs:
+      - bot_token_file: /etc/alertmanager/telegram-bot-token
+        chat_id_file: /etc/alertmanager/telegram-chat-id
+        send_resolved: true
+        # Plain text: the annotations are not HTML.
+        parse_mode: ""
+        # The dashboard lives next to Alertmanager, so its address follows from Alertmanager's own.
+        message: |-
+          {{ range .Alerts -}}
+          {{ if eq .Status "firing" }}FIRING{{ else }}RESOLVED{{ end }}: {{ .Labels.alertname }}
+          {{ .Annotations.summary }}
+          {{ .Annotations.description }}
+          {{ if eq .Status "firing" -}}
+            Since {{ .StartsAt.UTC.Format "2006-01-02 15:04 UTC" }}
+          {{- else -}}
+            Resolved {{ .EndsAt.UTC.Format "2006-01-02 15:04 UTC" }}, fired {{ .StartsAt.UTC.Format "2006-01-02 15:04 UTC" }}
+          {{- end }}
+
+          {{ end -}}
+          {{ reReplaceAll "alertmanager/?$" "grafana/d/reftrace-monitor" .ExternalURL }}

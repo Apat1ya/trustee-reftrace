@@ -1,0 +1,126 @@
+# Alerts for the referral monitor on the test stand.
+#
+# The monitor pushes its metrics (RunMetrics, and the JVM's) every minute, so there is no `up`
+# series: a process is alive while its pushed series keep arriving, and a series is gone five minutes
+# (the query lookback) after its last push. Every process is an instance of its own, a UUID, and its
+# reftrace_run_last_* series exist only once a run of that process started or ended: after a restart
+# the last run is found in the history, not in the current values.
+#
+# Severity: critical - the daily check is not happening or its result cannot be trusted;
+#           warning  - the check ran, but it covered far less than usual.
+
+groups:
+  - name: reftrace
+    interval: 1m
+    rules:
+
+      # When the last run with a report of each process ended. A run that ended without one does not
+      # count; one that found mismatches does, since finding them is the monitor doing its job.
+      - record: reftrace:run_last_success_timestamp_seconds
+        expr: >-
+          reftrace_run_last_finish_timestamp_seconds
+          and on (instance) (reftrace_run_last_status{status="no_report"} == 0)
+
+      # --- is the monitor alive at all -----------------------------------------------------------
+      # No push for the lookback's five minutes plus the five of `for`: the process is gone, or it
+      # stopped pushing.
+      - alert: ReftraceDown
+        expr: absent(process_uptime_milliseconds{job="trustee-reftrace"})
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: The referral monitor is not running
+          description: >-
+            No metrics have arrived from the monitor for ten minutes, so nothing is checking the
+            referral links. On the stand, see whether the container runs and what it logged last:
+            "cd ~/reftrace && docker compose ps" and "docker compose logs --tail=200 reftrace".
+
+      # --- did it actually run -------------------------------------------------------------------
+      # The newest successful end seen in the last 26 hours, of any process: one that restarted since
+      # still counts with the successes of the process before.
+      - alert: ReftraceNoSuccessfulRun26h
+        expr: >-
+          time() - max(max_over_time(reftrace:run_last_success_timestamp_seconds[26h])) > 93600
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: No referral check with a report in the last 26 hours
+          description: >-
+            The daily check should end with a report every 24 hours; the last one that did ended
+            more than 26 hours ago. Either the run was missed or the runs since ended without a
+            report. Look at "Last run" on the Reftrace monitor dashboard, then read the monitor's log
+            around the time of the last run.
+
+      # The other side of the rule above: in 26 hours not a single run ended with a report, although
+      # the monitor was already pushing 26 to 27 hours ago (by any process: one restarted every day
+      # before its run comes around is caught too).
+      - alert: ReftraceNoSuccessfulRunEver
+        expr: >-
+          absent_over_time(reftrace:run_last_success_timestamp_seconds[26h])
+          and on () count(present_over_time(process_uptime_milliseconds{job="trustee-reftrace"}[1h] offset 26h))
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: No referral check has ended with a report for as long as the monitor has been up
+          description: >-
+            The monitor has been running for more than 26 hours and none of its runs ended with a
+            report. Check that the schedule is on (REFTRACE_SCHEDULE_ENABLED) and whether the
+            container keeps restarting before the run comes around, then read the log of the last
+            run.
+
+      # A run that ended without a report, or one where the monitor itself failed more than one check
+      # in ten (a browser that crashed, a page that did not load, the run's time running out).
+      - alert: ReftraceRunNotTrustworthy
+        expr: >-
+          reftrace_run_last_status{status="no_report"} == 1
+          or on (instance)
+          label_replace(
+            sum by (job, instance) (reftrace_run_last_checks{outcome="failed"})
+            / sum by (job, instance) (reftrace_run_last_checks) > 0.1,
+            "status", "degraded", "", "")
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: The last referral check says nothing about the site
+          description: >-
+            The last run ended as {{ $labels.status }}: no_report means it stopped without writing
+            a report, degraded means the monitor itself failed more than one check in ten. Either
+            way its result is "could not tell", not "the site is fine". Read the monitor's log for
+            that run; if the cause was a one-off, the next night's run clears this.
+
+      # A run that started more than seven hours ago and has not ended: past the six hours the run is
+      # allowed, so it is stuck, most likely on a browser that froze.
+      - alert: ReftraceRunStuck
+        expr: >-
+          (time() - reftrace_run_last_start_timestamp_seconds > 25200)
+          unless on (instance)
+          (reftrace_run_last_finish_timestamp_seconds >= on (instance) reftrace_run_last_start_timestamp_seconds)
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: A referral check has been running for more than seven hours
+          description: >-
+            A run started more than seven hours ago and has not ended, past its own six-hour limit,
+            so it is almost certainly stuck rather than working, and today's result will not
+            arrive by itself. Restart the monitor: "cd ~/reftrace && docker compose restart reftrace".
+
+      # --- did it cover the site -----------------------------------------------------------------
+      - alert: ReftraceCoverageDropped
+        expr: >-
+          max by (job) (reftrace_run_last_pages)
+          < 0.7 * max by (job) (max_over_time(reftrace_run_last_pages[7d]))
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: The referral check visited far fewer pages than usual
+          description: >-
+            The last run visited {{ $value }} distinct pages, less than 70 percent of the most of
+            the past week. The monitor can look healthy while it tests only part of the site. Compare
+            "Pages" on the Reftrace monitor dashboard with the days before, and look at the start
+            pages and the sitemap in the run's report before trusting its result.

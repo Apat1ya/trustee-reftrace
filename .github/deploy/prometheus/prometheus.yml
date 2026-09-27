@@ -1,0 +1,17 @@
+# Nothing is scraped: the monitor pushes its metrics over OTLP to /api/v1/otlp/v1/metrics every minute
+# and once more when it stops (compose.yml switches that on). Prometheus names each process by its
+# service.name and service.instance.id: job="trustee-reftrace", instance=<a UUID per process>.
+global:
+  # Matches the monitor's push interval; the rules only read values that change once a run.
+  evaluation_interval: 1m
+
+rule_files:
+  # Not *.yml: the promtool tests live next to the rules, and Prometheus would refuse to start if it
+  # loaded one of them as a rule file. A new rule file therefore has to be named *-alerts.yml.
+  - /etc/prometheus/rules/*-alerts.yml
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093

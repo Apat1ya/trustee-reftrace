@@ -1,0 +1,12 @@
+apiVersion: 1
+
+# The dashboards next to this file. They are part of the repository, so a change made in the
+# browser would be lost on the next deploy: changes go into the JSON files.
+providers:
+  - name: reftrace
+    orgId: 1
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    options:
+      path: /etc/grafana/provisioning/dashboards

@@ -1,0 +1,16 @@
+apiVersion: 1
+
+# The run folders as Caddy serves them inside the network: the list of runs as its JSON directory
+# listing, and each run's report.json. The run dashboard asks for paths relative to this URL.
+# The uid is fixed because the run dashboard refers to it.
+datasources:
+  - name: Reports
+    uid: reftrace-reports
+    type: yesoreyeram-infinity-datasource
+    access: proxy
+    url: http://caddy:8088
+    editable: false
+    jsonData:
+      # Nothing but the run folders.
+      allowedHosts:
+        - http://caddy:8088

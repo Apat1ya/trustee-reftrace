@@ -1,0 +1,1030 @@
+{
+  "uid": "reftrace-run-time",
+  "title": "Where the run's time goes",
+  "description": "Where a run's browser time went, from the traces in Tempo: busy and idle lanes, time by stage, time lost to timeouts, exit clicks that went nowhere and repeated work.",
+  "tags": [
+    "reftrace",
+    "traces"
+  ],
+  "editable": true,
+  "graphTooltip": 1,
+  "schemaVersion": 41,
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "refresh": "",
+  "timezone": "",
+  "links": [
+    {
+      "title": "This run in Traces Drilldown",
+      "type": "link",
+      "url": "/a/grafana-exploretraces-app/explore?var-ds=reftrace-tempo&var-primarySignal=nestedSetParent%3C0&var-filters=span.reftrace.run.id%7C%3D%7C${run}&var-metric=duration&actionView=breakdown",
+      "targetBlank": true,
+      "icon": "external link",
+      "keepTime": true,
+      "includeVars": false
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "run",
+        "label": "Run",
+        "type": "query",
+        "datasource": {
+          "type": "tempo",
+          "uid": "reftrace-tempo"
+        },
+        "query": {
+          "label": "span.reftrace.run.id",
+          "refId": "TempoDatasourceVariableQueryEditor-VariableQuery",
+          "type": 1
+        },
+        "definition": "span.reftrace.run.id",
+        "refresh": 2,
+        "sort": 2,
+        "includeAll": false,
+        "multi": false,
+        "description": "Runs with traces in the time range; pick a range that covers the whole run."
+      },
+      {
+        "name": "slow",
+        "label": "Slow visit",
+        "type": "custom",
+        "query": "5s,10s,20s,30s,60s",
+        "current": {
+          "text": "10s",
+          "value": "10s"
+        },
+        "options": [
+          {
+            "text": "5s",
+            "value": "5s",
+            "selected": false
+          },
+          {
+            "text": "10s",
+            "value": "10s",
+            "selected": true
+          },
+          {
+            "text": "20s",
+            "value": "20s",
+            "selected": false
+          },
+          {
+            "text": "30s",
+            "value": "30s",
+            "selected": false
+          },
+          {
+            "text": "60s",
+            "value": "60s",
+            "selected": false
+          }
+        ],
+        "description": "The duration from which a visit is listed as slow."
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Busy in visits",
+      "description": "Lane-seconds the browsers spent on visits: the sum of the durations of the run's visit traces.",
+      "datasource": {
+        "type": "tempo",
+        "uid": "reftrace-tempo"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "reftrace-tempo"
+          },
+          "queryType": "traceql",
+          "query": "{name=\"visit\" && span.reftrace.run.id=\"$run\"} | sum_over_time(duration)",
+          "limit": 20,
+          "tableType": "traces",
+          "metricsQueryType": "range"
+        }
+      ],
+      "maxDataPoints": 100,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "noValue": "0"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center"
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Idle",
+      "description": "Lane-seconds a browser lane had no task to do (lane.idle), at any time of the run.",
+      "datasource": {
+        "type": "tempo",
+        "uid": "reftrace-tempo"
+      },
+      "gridPos": {
+        "x": 3,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "reftrace-tempo"
+          },
+          "queryType": "traceql",
+          "query": "{name=\"lane.idle\" && span.reftrace.run.id=\"$run\"} | sum_over_time(duration)",
+          "limit": 20,
+          "tableType": "traces",
+          "metricsQueryType": "range"
+        }
+      ],
+      "maxDataPoints": 100,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "noValue": "0"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center"
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Idle at the end",
+      "description": "Lane-seconds of idleness that lasted until the run ended: lanes that had finished while others were still on their last visits.",
+      "datasource": {
+        "type": "tempo",
+        "uid": "reftrace-tempo"
+      },
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "reftrace-tempo"
+          },
+          "queryType": "traceql",
+          "query": "{name=\"lane.idle\" && span.reftrace.run.id=\"$run\" && span.reftrace.idle.ended=\"run-end\"} | sum_over_time(duration)",
+          "limit": 20,
+          "tableType": "traces",
+          "metricsQueryType": "range"
+        }
+      ],
+      "maxDataPoints": 100,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "noValue": "0"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center"
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Timed out",
+      "description": "Seconds of stages whose wait ended by its timeout rather than by what it waited for (settle and QR not included).",
+      "datasource": {
+        "type": "tempo",
+        "uid": "reftrace-tempo"
+      },
+      "gridPos": {
+        "x": 9,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "reftrace-tempo"
+          },
+          "queryType": "traceql",
+          "query": "{name=\"visit\" && span.reftrace.run.id=\"$run\"} >> {span.reftrace.wait.outcome=\"timeout\"} | sum_over_time(duration)",
+          "limit": 20,
+          "tableType": "traces",
+          "metricsQueryType": "range"
+        }
+      ],
+      "maxDataPoints": 100,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "noValue": "0"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center"
+      }
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Retried",
+      "description": "Seconds of attempts whose result was thrown away because another attempt followed.",
+      "datasource": {
+        "type": "tempo",
+        "uid": "reftrace-tempo"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "reftrace-tempo"
+          },
+          "queryType": "traceql",
+          "query": "{name=\"visit\" && span.reftrace.run.id=\"$run\"} >> {name=\"attempt\" && span.reftrace.retried=\"true\"} | sum_over_time(duration)",
+          "limit": 20,
+          "tableType": "traces",
+          "metricsQueryType": "range"
+        }
+      ],
+      "maxDataPoints": 100,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "noValue": "0"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center"
+      }
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Replayed steps",
+      "description": "Seconds of steps that only replay the way to the page a visit continues from, in a fresh browser context.",
+      "datasource": {
+        "type": "tempo",
+        "uid": "reftrace-tempo"
+      },
+      "gridPos": {
+        "x": 15,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "reftrace-tempo"
+          },
+          "queryType": "traceql",
+          "query": "{name=\"visit\" && span.reftrace.run.id=\"$run\"} >> {span.reftrace.replay=\"true\"} | sum_over_time(duration)",
+          "limit": 20,
+          "tableType": "traces",
+          "metricsQueryType": "range"
+        }
+      ],
+      "maxDataPoints": 100,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "noValue": "0"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center"
+      }
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Read again",
+      "description": "Seconds of visits that read a page again: a redirect led them to a page the walk had already given to another visit.",
+      "datasource": {
+        "type": "tempo",
+        "uid": "reftrace-tempo"
+      },
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "reftrace-tempo"
+          },
+          "queryType": "traceql",
+          "query": "{name=\"visit\" && span.reftrace.run.id=\"$run\" && span.reftrace.repeat=\"true\"} | sum_over_time(duration)",
+          "limit": 20,
+          "tableType": "traces",
+          "metricsQueryType": "range"
+        }
+      ],
+      "maxDataPoints": 100,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "noValue": "0"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center"
+      }
+    },
+    {
+      "id": 8,
+      "type": "stat",
+      "title": "Visits",
+      "description": "Visit traces of the run.",
+      "datasource": {
+        "type": "tempo",
+        "uid": "reftrace-tempo"
+      },
+      "gridPos": {
+        "x": 21,
+        "y": 0,
+        "w": 3,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "reftrace-tempo"
+          },
+          "queryType": "traceql",
+          "query": "{name=\"visit\" && span.reftrace.run.id=\"$run\"} | count_over_time()",
+          "limit": 20,
+          "tableType": "traces",
+          "metricsQueryType": "range"
+        }
+      ],
+      "maxDataPoints": 100,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          },
+          "noValue": "0"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "none",
+        "graphMode": "none",
+        "textMode": "value",
+        "justifyMode": "center"
+      }
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Browser lanes busy and idle over time",
+      "description": "Lane-seconds per interval, stacked: in visits, and idle until a task came or until the run ended. The top of the stack is lanes x interval; a gap below it is time between visits. Each span counts in the interval it started in.",
+      "datasource": {
+        "type": "tempo",
+        "uid": "reftrace-tempo"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 24,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "reftrace-tempo"
+          },
+          "queryType": "traceql",
+          "query": "{(name=\"visit\" || name=\"lane.idle\") && span.reftrace.run.id=\"$run\"} | sum_over_time(duration) by (name, span.reftrace.idle.ended)",
+          "limit": 20,
+          "tableType": "traces",
+          "metricsQueryType": "range"
+        }
+      ],
+      "maxDataPoints": 120,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            },
+            "lineWidth": 0
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "^visit$",
+            "renamePattern": "busy in visits"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*idle.ended=\"?([a-z-]+)\"?.*",
+            "renamePattern": "idle until $1"
+          }
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "bargauge",
+      "title": "Time by stage",
+      "description": "Seconds spent in each stage over the whole run. Stages nest (a step holds its load, settle and reveal; the scan holds the exit clicks), so the bars do not add up to the run.",
+      "datasource": {
+        "type": "tempo",
+        "uid": "reftrace-tempo"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 12,
+        "h": 11
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "reftrace-tempo"
+          },
+          "queryType": "traceql",
+          "query": "{name=\"visit\" && span.reftrace.run.id=\"$run\"} >> {name != \"attempt\"} | sum_over_time(duration) by (name)",
+          "limit": 20,
+          "tableType": "traces",
+          "metricsQueryType": "range"
+        }
+      ],
+      "maxDataPoints": 100,
+      "transformations": [
+        {
+          "id": "reduce",
+          "options": {
+            "reducers": [
+              "sum"
+            ],
+            "labelsToFields": false,
+            "mode": "seriesToRows"
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Total",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Total$/",
+          "values": true
+        },
+        "orientation": "horizontal",
+        "displayMode": "basic",
+        "showUnfilled": true,
+        "valueMode": "text",
+        "namePlacement": "left",
+        "sizing": "manual",
+        "minVizHeight": 16,
+        "maxVizHeight": 22
+      }
+    },
+    {
+      "id": 11,
+      "type": "bargauge",
+      "title": "Time lost to timeouts by stage",
+      "description": "Seconds of stages whose wait ran out, by stage and by what it waited for: document (page load), actionable (a followed link that never became clickable), reaction (a click after which nothing happened), hover and menu (uncovering a link), reveal (the reveal budget).",
+      "datasource": {
+        "type": "tempo",
+        "uid": "reftrace-tempo"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 12,
+        "w": 12,
+        "h": 11
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "reftrace-tempo"
+          },
+          "queryType": "traceql",
+          "query": "{name=\"visit\" && span.reftrace.run.id=\"$run\"} >> {span.reftrace.wait.outcome=\"timeout\"} | sum_over_time(duration) by (name, span.reftrace.wait.for)",
+          "limit": 20,
+          "tableType": "traces",
+          "metricsQueryType": "range"
+        }
+      ],
+      "maxDataPoints": 100,
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*name=\"([^\"]+)\".*wait.for=\"([^\"]+)\".*",
+            "renamePattern": "$1 ($2)"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "orange"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "displayMode": "basic",
+        "showUnfilled": true,
+        "valueMode": "text",
+        "namePlacement": "left",
+        "sizing": "manual",
+        "minVizHeight": 16,
+        "maxVizHeight": 22
+      }
+    },
+    {
+      "id": 12,
+      "type": "table",
+      "title": "Exit clicks after which nothing happened",
+      "description": "Seconds waited by exit clicks after which nothing happened, by link and element, most first. Each such click waits the whole limits.action.click-navigation (2 s) for a navigation that never comes.",
+      "datasource": {
+        "type": "tempo",
+        "uid": "reftrace-tempo"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 23,
+        "w": 24,
+        "h": 9
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "reftrace-tempo"
+          },
+          "queryType": "traceql",
+          "query": "{name=\"visit\" && span.reftrace.run.id=\"$run\"} >> {name=\"page.exit-click\" && span.reftrace.click=\"no-navigation\"} | sum_over_time(duration) by (span.reftrace.href, span.reftrace.selector)",
+          "limit": 20,
+          "tableType": "traces",
+          "metricsQueryType": "range"
+        }
+      ],
+      "maxDataPoints": 100,
+      "transformations": [
+        {
+          "id": "reduce",
+          "options": {
+            "reducers": [
+              "sum"
+            ],
+            "labelsToFields": true,
+            "mode": "seriesToRows"
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "sort": [
+              {
+                "field": "Total",
+                "desc": true
+              }
+            ]
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Field": true
+            },
+            "renameByName": {
+              "span.reftrace.href": "link",
+              "span.reftrace.selector": "element",
+              "Total": "seconds waited"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm"
+      }
+    },
+    {
+      "id": 13,
+      "type": "bargauge",
+      "title": "Repeated work",
+      "description": "Seconds of work done again: attempts thrown away for a retry (by why), and steps that only replay the way to the page a visit continues from (by step).",
+      "datasource": {
+        "type": "tempo",
+        "uid": "reftrace-tempo"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "reftrace-tempo"
+          },
+          "queryType": "traceql",
+          "query": "{name=\"visit\" && span.reftrace.run.id=\"$run\"} >> {(name=\"attempt\" && span.reftrace.retried=\"true\") || span.reftrace.replay=\"true\"} | sum_over_time(duration) by (name, span.reftrace.retry.reason)",
+          "limit": 20,
+          "tableType": "traces",
+          "metricsQueryType": "range"
+        }
+      ],
+      "maxDataPoints": 100,
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*retry.reason=\"([^\"]+)\".*",
+            "renamePattern": "attempts retried for $1"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "^(step[.].+)$",
+            "renamePattern": "$1 steps replayed"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "purple"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "horizontal",
+        "displayMode": "basic",
+        "showUnfilled": true,
+        "valueMode": "text",
+        "namePlacement": "left",
+        "sizing": "manual",
+        "minVizHeight": 16,
+        "maxVizHeight": 22
+      }
+    },
+    {
+      "id": 14,
+      "type": "timeseries",
+      "title": "Retries over time",
+      "description": "Attempts thrown away for another one, by the reason the page was not reached.",
+      "datasource": {
+        "type": "tempo",
+        "uid": "reftrace-tempo"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "reftrace-tempo"
+          },
+          "queryType": "traceql",
+          "query": "{name=\"visit\" && span.reftrace.run.id=\"$run\"} >> {name=\"attempt\" && span.reftrace.retried=\"true\"} | count_over_time() by (span.reftrace.retry.reason)",
+          "limit": 20,
+          "tableType": "traces",
+          "metricsQueryType": "range"
+        }
+      ],
+      "maxDataPoints": 100,
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "custom": {
+            "drawStyle": "bars",
+            "fillOpacity": 80,
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 15,
+      "type": "table",
+      "title": "Slowest visits",
+      "description": "Visits of the run that took longer than the chosen duration (at most 100); the trace id opens the trace. Sort by duration to see the slowest first.",
+      "datasource": {
+        "type": "tempo",
+        "uid": "reftrace-tempo"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 40,
+        "w": 24,
+        "h": 10
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "tempo",
+            "uid": "reftrace-tempo"
+          },
+          "queryType": "traceql",
+          "query": "{name=\"visit\" && span.reftrace.run.id=\"$run\" && duration > $slow} | select(span.reftrace.page.url, span.reftrace.path, span.reftrace.outcome, span.reftrace.lane, span.reftrace.queue.wait, span.reftrace.repeat)",
+          "limit": 100,
+          "tableType": "spans"
+        }
+      ],
+      "maxDataPoints": 100,
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "traceService": true,
+              "traceName": true,
+              "name": true,
+              "spanID": false
+            }
+          }
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "sortBy": [
+          {
+            "displayName": "Duration",
+            "desc": true
+          }
+        ]
+      }
+    }
+  ]
+}

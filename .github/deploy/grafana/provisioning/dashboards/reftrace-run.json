@@ -1,0 +1,2032 @@
+{
+  "editable": true,
+  "panels": [
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "When the shown run started and its verdict: Issues found = a link lost or replaced the key; OK = no link did; No report = the run folder has no report.json (crashed or still running). Whole run, not filtered.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "Issues found": {
+                  "color": "red",
+                  "index": 1
+                },
+                "No report (crashed or running)": {
+                  "color": "#8e8e8e",
+                  "index": 2
+                },
+                "OK": {
+                  "color": "green",
+                  "index": 0
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Run.*$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 20,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "",
+      "transformations": [
+        {
+          "id": "filterByRefId",
+          "options": {
+            "include": "R"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "T"
+                  }
+                },
+                "fieldName": "_k"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "Distinct pages opened with the selected devices. Not split by route: every page is checked for all routes.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "noValue": "–",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Page"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Pages checked"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 4,
+        "y": 0
+      },
+      "id": 102,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "distinctCount"
+          ],
+          "fields": "/^Pages\\ checked$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 14,
+          "valueSize": 44
+        },
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 20,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "",
+      "transformations": [
+        {
+          "id": "filterByRefId",
+          "options": {
+            "include": "R"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "V"
+                  }
+                },
+                "fieldName": "_k"
+              },
+              {
+                "config": {
+                  "id": "regex",
+                  "options": {
+                    "value": "^(${profile:pipe})$"
+                  }
+                },
+                "fieldName": "profile"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "Page visits with the selected devices (one visit = page + profile, all scenarios). Not split by route.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "noValue": "–",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_v"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Visits"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 7,
+        "y": 0
+      },
+      "id": 103,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^Visits$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 14,
+          "valueSize": 44
+        },
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 20,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "",
+      "transformations": [
+        {
+          "id": "filterByRefId",
+          "options": {
+            "include": "R"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "V"
+                  }
+                },
+                "fieldName": "_k"
+              },
+              {
+                "config": {
+                  "id": "regex",
+                  "options": {
+                    "value": "^(${profile:pipe})$"
+                  }
+                },
+                "fieldName": "profile"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "Links whose destination was followed and compared with the referral key. From coverage in report.json, which has no breakdown by device or route, so the Profile and Route filters do not change it.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "noValue": "–",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Links checked"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Links checked · whole run"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 10,
+        "y": 0
+      },
+      "id": 104,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Links\\ checked\\ ·\\ whole\\ run$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 14,
+          "valueSize": 44
+        },
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 20,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "",
+      "transformations": [
+        {
+          "id": "filterByRefId",
+          "options": {
+            "include": "R"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "T"
+                  }
+                },
+                "fieldName": "_k"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "Links that kept the referral key. From coverage in report.json, which has no breakdown by device or route, so the Profile and Route filters do not change it.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "noValue": "–",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Passed"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Passed · whole run"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 13,
+        "y": 0
+      },
+      "id": 105,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Passed\\ ·\\ whole\\ run$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 14,
+          "valueSize": 44
+        },
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 20,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "",
+      "transformations": [
+        {
+          "id": "filterByRefId",
+          "options": {
+            "include": "R"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "T"
+                  }
+                },
+                "fieldName": "_k"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "Links that lost the referral key or carry another value in its place (coverage.checks.mismatch). From coverage in report.json, which has no breakdown by device or route, so the Profile and Route filters do not change it.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "noValue": "–",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "transparent",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Key lost or replaced"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Key lost or replaced · whole run"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 0
+      },
+      "id": 106,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Key\\ lost\\ or\\ replaced\\ ·\\ whole\\ run$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 14,
+          "valueSize": 44
+        },
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 20,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "",
+      "transformations": [
+        {
+          "id": "filterByRefId",
+          "options": {
+            "include": "R"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "T"
+                  }
+                },
+                "fieldName": "_k"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "untested[] entries of the selected devices, e.g. a QR code hidden on this screen or a click that led nowhere. untested[] entries have no route, so the Route filter does not apply here; the Profile filter does.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "noValue": "–",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "transparent",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "orange",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_nc"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Not checked · all routes"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 0
+      },
+      "id": 107,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "/^Not\\ checked\\ ·\\ all\\ routes$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 14,
+          "valueSize": 44
+        },
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 20,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "",
+      "transformations": [
+        {
+          "id": "filterByRefId",
+          "options": {
+            "include": "R"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "V"
+                  }
+                },
+                "fieldName": "_k"
+              },
+              {
+                "config": {
+                  "id": "regex",
+                  "options": {
+                    "value": "^(${profile:pipe})$"
+                  }
+                },
+                "fieldName": "profile"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "reftrace-prometheus"
+      },
+      "description": "Last 14 days (UTC), not filtered, from the metrics every run pushes (Prometheus), so runs that left no report count too. Each day shows the status of the run that ended last that day, over all processes. OK = no link lost the key; Issues found = at least one link lost or replaced the key; No report = the run ended without report.json, or its process went away (crash, PC off) before the run ended; Missed = no run started that day. An empty cell = the only run of the day is still going. Days before the metrics existed (2026-09-27) show Missed.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "filterable": false,
+            "minWidth": 80
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byType",
+              "options": "number"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "color": "#8e8e8e",
+                        "index": 3,
+                        "text": "Missed"
+                      },
+                      "1": {
+                        "color": "green",
+                        "index": 0,
+                        "text": "OK"
+                      },
+                      "2": {
+                        "color": "red",
+                        "index": 1,
+                        "text": "Issues found"
+                      },
+                      "3": {
+                        "color": "orange",
+                        "index": 2,
+                        "text": "No report"
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "custom.align",
+                "value": "center"
+              },
+              {
+                "id": "custom.minWidth",
+                "value": 50
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "hideTimeOverride": true,
+      "id": 101,
+      "interval": "1d",
+      "maxDataPoints": 16,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "reftrace-prometheus"
+          },
+          "editorMode": "code",
+          "expr": "max((max by (instance) ((last_over_time(reftrace_run_last_status{job=\"trustee-reftrace\", status=\"ok\"}[1d] offset -1d) == 1) or (last_over_time(reftrace_run_last_status{job=\"trustee-reftrace\", status=\"issues_found\"}[1d] offset -1d) == 1) * 2 or (last_over_time(reftrace_run_last_status{job=\"trustee-reftrace\", status=\"no_report\"}[1d] offset -1d) == 1) * 3) unless on (instance) ((max by (instance) (last_over_time(process_start_time_milliseconds{job=\"trustee-reftrace\"}[1d] offset -1d) + last_over_time(process_uptime_milliseconds{job=\"trustee-reftrace\"}[1d] offset -1d)) / 1000 > time()) and on (instance) ((max by (instance) (last_over_time(reftrace_run_last_start_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d)) > on (instance) max by (instance) (last_over_time(reftrace_run_last_finish_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d))) or (max by (instance) (last_over_time(reftrace_run_last_start_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d)) unless on (instance) max by (instance) (last_over_time(reftrace_run_last_finish_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d)))) unless on (instance) present_over_time(process_uptime_milliseconds{job=\"trustee-reftrace\"}[30d] offset -31d) unless on (instance) present_over_time(process_uptime_milliseconds{job=\"trustee-reftrace\"}[3m] @ ${__to:date:seconds}))) and on (instance) topk(1, ((max by (instance) (last_over_time(process_start_time_milliseconds{job=\"trustee-reftrace\"}[1d] offset -1d) + last_over_time(process_uptime_milliseconds{job=\"trustee-reftrace\"}[1d] offset -1d)) / 1000 > time()) and on (instance) ((max by (instance) (last_over_time(reftrace_run_last_start_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d)) > on (instance) max by (instance) (last_over_time(reftrace_run_last_finish_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d))) or (max by (instance) (last_over_time(reftrace_run_last_start_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d)) unless on (instance) max by (instance) (last_over_time(reftrace_run_last_finish_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d)))) unless on (instance) present_over_time(process_uptime_milliseconds{job=\"trustee-reftrace\"}[30d] offset -31d) unless on (instance) present_over_time(process_uptime_milliseconds{job=\"trustee-reftrace\"}[3m] @ ${__to:date:seconds})) or (max by (instance) (last_over_time(reftrace_run_last_finish_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d)) > time())) or (((max by (instance) (last_over_time(process_start_time_milliseconds{job=\"trustee-reftrace\"}[1d] offset -1d) + last_over_time(process_uptime_milliseconds{job=\"trustee-reftrace\"}[1d] offset -1d)) / 1000 > time()) and on (instance) ((max by (instance) (last_over_time(reftrace_run_last_start_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d)) > on (instance) max by (instance) (last_over_time(reftrace_run_last_finish_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d))) or (max by (instance) (last_over_time(reftrace_run_last_start_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d)) unless on (instance) max by (instance) (last_over_time(reftrace_run_last_finish_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d)))) unless on (instance) present_over_time(process_uptime_milliseconds{job=\"trustee-reftrace\"}[30d] offset -31d) unless on (instance) present_over_time(process_uptime_milliseconds{job=\"trustee-reftrace\"}[3m] @ ${__to:date:seconds})) > bool 0) * 3 and on (instance) topk(1, ((max by (instance) (last_over_time(process_start_time_milliseconds{job=\"trustee-reftrace\"}[1d] offset -1d) + last_over_time(process_uptime_milliseconds{job=\"trustee-reftrace\"}[1d] offset -1d)) / 1000 > time()) and on (instance) ((max by (instance) (last_over_time(reftrace_run_last_start_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d)) > on (instance) max by (instance) (last_over_time(reftrace_run_last_finish_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d))) or (max by (instance) (last_over_time(reftrace_run_last_start_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d)) unless on (instance) max by (instance) (last_over_time(reftrace_run_last_finish_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d)))) unless on (instance) present_over_time(process_uptime_milliseconds{job=\"trustee-reftrace\"}[30d] offset -31d) unless on (instance) present_over_time(process_uptime_milliseconds{job=\"trustee-reftrace\"}[3m] @ ${__to:date:seconds})) or (max by (instance) (last_over_time(reftrace_run_last_finish_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d)) > time()))) or (vector(0) unless on () count(max by (instance) (last_over_time(reftrace_run_last_start_timestamp_seconds{job=\"trustee-reftrace\"}[1d] offset -1d)) > time()))",
+          "format": "time_series",
+          "instant": false,
+          "interval": "1d",
+          "legendFormat": "Value",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "timeFrom": "13d",
+      "title": "Runs by day (UTC)",
+      "transformations": [
+        {
+          "id": "formatTime",
+          "options": {
+            "outputFormat": "MMM DD",
+            "timeField": "Time",
+            "useTimezone": false
+          }
+        },
+        {
+          "id": "rowsToFields",
+          "options": {
+            "mappings": [
+              {
+                "fieldName": "Time",
+                "handlerKey": "field.name"
+              },
+              {
+                "fieldName": "Value",
+                "handlerKey": "field.value"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Mixed --"
+      },
+      "description": "One row per page for the selected devices and routes (pages[] of report.json summed over its visits; one visit = page + profile). The arrow lists the page's problems; the same problem (href, selector, actual, route, checked, expected) seen on several of the selected devices is one row; path and screenshot are from its first occurrence. actual null = no key found. Not checked ignores the Route filter (untested items have no route). Long cells are one line: hover a cell and click its inspect icon.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "filterable": false,
+            "minWidth": 80
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Page"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 520
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "Open on the site",
+                    "url": "${__value.raw}"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_v (sum) (first)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Visits"
+              },
+              {
+                "id": "custom.width",
+                "value": 70
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_dev (uniqueValues) (first)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Devices"
+              },
+              {
+                "id": "custom.width",
+                "value": 300
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Scenarios (first)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Scenarios"
+              },
+              {
+                "id": "custom.width",
+                "value": 240
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_p (sum) (sum)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Links with a problem"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "red",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "custom.width",
+                "value": 160
+              },
+              {
+                "id": "noValue",
+                "value": "0"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_nc (sum) (first)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Not checked"
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "orange",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "noValue",
+                "value": "0"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      },
+      "id": 20,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Links with a problem"
+          }
+        ]
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-testdata-datasource",
+            "uid": "reftrace-testdata"
+          },
+          "rawFrameContent": "[{\"name\": \"C\", \"fields\": [{\"name\": \"Page\", \"type\": \"string\", \"values\": [], \"config\": {}}, {\"name\": \"profile\", \"type\": \"string\", \"values\": [], \"config\": {}}, {\"name\": \"route\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 115}}}, {\"name\": \"href\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 260, \"inspect\": true, \"cellOptions\": {\"type\": \"auto\", \"wrapText\": false}}}}, {\"name\": \"expected\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 125}}}, {\"name\": \"actual\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 125}, \"noValue\": \"null\"}}, {\"name\": \"selector\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 240, \"inspect\": true, \"cellOptions\": {\"type\": \"auto\", \"wrapText\": false}}}}, {\"name\": \"checked\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"hidden\": true}}}, {\"name\": \"screenshot\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 200, \"inspect\": true, \"cellOptions\": {\"type\": \"auto\", \"wrapText\": false}}}}, {\"name\": \"path\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"inspect\": true, \"cellOptions\": {\"type\": \"auto\", \"wrapText\": false}}}}, {\"name\": \"_p\", \"type\": \"number\", \"values\": [], \"config\": {}}, {\"name\": \"_rk\", \"type\": \"string\", \"values\": [], \"config\": {}}]}, {\"name\": \"D\", \"fields\": [{\"name\": \"Reason\", \"type\": \"string\", \"values\": [], \"config\": {}}, {\"name\": \"Kind\", \"type\": \"string\", \"values\": [], \"config\": {}}, {\"name\": \"_visit\", \"type\": \"string\", \"values\": [], \"config\": {}}, {\"name\": \"_n\", \"type\": \"number\", \"values\": [], \"config\": {}}, {\"name\": \"Page\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 420}, \"links\": [{\"title\": \"Open on the site\", \"url\": \"${__value.raw}\", \"targetBlank\": true}]}}, {\"name\": \"profile\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 130}}}, {\"name\": \"selector\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 420, \"inspect\": true, \"cellOptions\": {\"type\": \"auto\", \"wrapText\": false}}}}, {\"name\": \"screenshot\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"inspect\": true, \"cellOptions\": {\"type\": \"auto\", \"wrapText\": false}}}}]}]",
+          "refId": "C",
+          "scenarioId": "raw_frame"
+        },
+        {
+          "columns": [],
+          "datasource": {
+            "type": "yesoreyeram-infinity-datasource",
+            "uid": "reftrace-reports"
+          },
+          "filters": [],
+          "format": "table",
+          "parser": "backend",
+          "refId": "R",
+          "root_selector": "(\n  $t := (\n  $ch := coverage.checks;\n  $mismatch := $exists($ch) ? $ch.mismatch : $exists(coverage.brokenLinksFound) ? coverage.brokenLinksFound : $count(problems);\n  $exists(run) ? {\n    \"_k\": \"T\",\n    \"Run · \" & $fromMillis($toMillis(run.startedAt), \"[MNn,3-3] [D01], [H01]:[m01] UTC\"): $mismatch > 0 ? \"Issues found\" : \"OK\",\n    \"Links checked\": coverage.links.checked,\n    \"Passed\": $ch.pass,\n    \"Key lost or replaced\": $ch.mismatch\n  } : { \"_k\": \"T\", \"Run\": \"No report (crashed or running)\" }\n);\n  $v := (\n  $routes := $join($map($sort($distinct(pages.problems[route and route != \"\"].route)), function($r) { \"«\" & $r & \"»\" }));\n  $root := $;\n  [pages.(\n    $p := $;\n    {\n      \"_k\": \"V\", \"Page\": $p.page, \"profile\": $p.profile, \"_dev\": $p.profile,\n      \"Scenarios\": $join($sort($distinct($root.pages[page = $p.page].scenarios)), \", \"),\n      \"_v\": 1, \"_nc\": $count($p.untested), \"_rk\": $routes\n    }\n  )]\n);\n  $p := (\n  $compact := function($v) {\n    $type($v) = \"string\" ? $v\n    : $type($v) = \"object\" ? $join($each($v, function($x, $k) { $k & \"=\" & $x }), \", \")\n    : $exists($v) and $type($v) != \"null\" ? $string($v) : \"null\"\n  };\n  [pages.(\n    $p := $;\n    $steps := $join($map($p.path, function($s, $i) { ($i + 1) & \". \" & $s }), \" | \");\n    problems.{\n      \"_k\": \"P\", \"Page\": $p.page, \"profile\": $p.profile, \"route\": route ? route : \"\", \"href\": href ? href : \"\",\n      \"expected\": expected ? expected : \"\", \"actual\": $compact(actual), \"selector\": selector ? selector : \"\",\n      \"checked\": $compact(checked), \"screenshot\": screenshot ? screenshot : \"\", \"path\": $steps ? $steps : \"\",\n      \"_p\": 1, \"_rk\": \"«\" & (route ? route : \"\") & \"»\"\n    }\n  )]\n);\n  $u := (\n  $site := [\"qrHidden\", \"qrUnreadable\", \"pageGone\"];\n  [pages.(\n    $p := $;\n    untested.{\n      \"_k\": \"U\", \"Reason\": reason ? reason : \"\",\n      \"Kind\": reason in $site ? \"not testable (site)\" : \"check failed (tool)\",\n      \"_visit\": $p.page & \" \" & $p.profile, \"_n\": 1, \"Page\": $p.page, \"profile\": $p.profile,\n      \"selector\": selector ? selector : \"\", \"screenshot\": screenshot ? screenshot : \"\"\n    }\n  )]\n);\n  $append($append($append([$t], $v), $p), $u)\n)",
+          "source": "url",
+          "type": "json",
+          "url": "/${run}/${report}",
+          "url_options": {
+            "data": "",
+            "headers": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET"
+          }
+        }
+      ],
+      "title": "Pages — arrow on the left lists the page's problems${key}",
+      "transformations": [
+        {
+          "filter": {
+            "id": "byName",
+            "options": "D"
+          },
+          "id": "filterByRefId",
+          "options": {
+            "include": "R"
+          }
+        },
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "R"
+          },
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "regex",
+                  "options": {
+                    "value": "^(V|P)$"
+                  }
+                },
+                "fieldName": "_k"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        },
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "R"
+          },
+          "id": "partitionByValues",
+          "options": {
+            "fields": [
+              "_k"
+            ],
+            "keepFields": false,
+            "naming": {
+              "asLabels": false
+            }
+          }
+        },
+        {
+          "filter": {
+            "id": "anyMatch",
+            "options": [
+              {
+                "id": "byName",
+                "options": "C"
+              },
+              {
+                "id": "byName",
+                "options": "P"
+              }
+            ]
+          },
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "filter": {
+            "id": "byName",
+            "options": "V"
+          },
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Page",
+                "profile",
+                "_dev",
+                "Scenarios",
+                "_v",
+                "_nc",
+                "_rk"
+              ]
+            }
+          }
+        },
+        {
+          "filter": {
+            "id": "invertMatch",
+            "options": {
+              "id": "byName",
+              "options": "V"
+            }
+          },
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Page",
+                "profile",
+                "route",
+                "href",
+                "expected",
+                "actual",
+                "selector",
+                "checked",
+                "screenshot",
+                "path",
+                "_p",
+                "_rk"
+              ]
+            }
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": "^(.+)$",
+            "renamePattern": "$1"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "regex",
+                  "options": {
+                    "value": "^(${profile:pipe})$"
+                  }
+                },
+                "fieldName": "profile"
+              },
+              {
+                "config": {
+                  "id": "regex",
+                  "options": {
+                    "value": "«(${route:pipe})»"
+                  }
+                },
+                "fieldName": "_rk"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "Page": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "Scenarios": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "_dev": {
+                "aggregations": [
+                  "uniqueValues"
+                ],
+                "operation": "aggregate"
+              },
+              "_nc": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "_p": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "_v": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "actual": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "checked": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "expected": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "href": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "path": {
+                "aggregations": [
+                  "first"
+                ],
+                "operation": "aggregate"
+              },
+              "route": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "screenshot": {
+                "aggregations": [
+                  "first"
+                ],
+                "operation": "aggregate"
+              },
+              "selector": {
+                "aggregations": [],
+                "operation": "groupby"
+              }
+            }
+          }
+        },
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "Page",
+            "mode": "outerTabular"
+          }
+        },
+        {
+          "id": "partitionByValues",
+          "options": {
+            "fields": [
+              "Page"
+            ],
+            "keepFields": true,
+            "naming": {
+              "asLabels": false
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "Page": 0,
+              "Scenarios": 3,
+              "_dev (uniqueValues)": 2,
+              "_nc (sum)": 5,
+              "_p (sum)": 4,
+              "_v (sum)": 1,
+              "actual": 9,
+              "checked": 11,
+              "expected": 8,
+              "href": 7,
+              "path (first)": 13,
+              "route": 6,
+              "screenshot (first)": 12,
+              "selector": 10
+            },
+            "renameByName": {
+              "path (first)": "path",
+              "screenshot (first)": "screenshot"
+            }
+          }
+        },
+        {
+          "id": "groupToNestedTable",
+          "options": {
+            "fields": {
+              "Page": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "Scenarios": {
+                "aggregations": [
+                  "first"
+                ],
+                "operation": "aggregate"
+              },
+              "_dev (uniqueValues)": {
+                "aggregations": [
+                  "first"
+                ],
+                "operation": "aggregate"
+              },
+              "_nc (sum)": {
+                "aggregations": [
+                  "first"
+                ],
+                "operation": "aggregate"
+              },
+              "_p (sum)": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "_v (sum)": {
+                "aggregations": [
+                  "first"
+                ],
+                "operation": "aggregate"
+              }
+            },
+            "showSubframeHeaders": true
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "untested[] of report.json grouped by reason, for the selected devices; the arrow lists every element not checked (page, profile, selector, screenshot). untested[] entries have no route, so the Route filter does not apply here; the Profile filter does.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "filterable": false,
+            "minWidth": 80
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_visit (distinctCount)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Visits"
+              },
+              {
+                "id": "description",
+                "value": "Visits (page + profile) with at least one element for this reason."
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_n (sum)"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Elements"
+              },
+              {
+                "id": "description",
+                "value": "untested[] entries with this reason."
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Kind"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "check failed (tool)": {
+                        "color": "orange",
+                        "index": 1
+                      },
+                      "not testable (site)": {
+                        "color": "#EAB839",
+                        "index": 0
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              },
+              {
+                "id": "description",
+                "value": "not testable (site) = the site did not allow the check (e.g. QR hidden on this screen); check failed (tool) = there was something to check but the monitor could not."
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 22
+      },
+      "id": 10,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Elements"
+          }
+        ]
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 20,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "Not checked, by reason — all routes (arrow on the left lists the elements)",
+      "transformations": [
+        {
+          "filter": {
+            "id": "byName",
+            "options": "C"
+          },
+          "id": "filterByRefId",
+          "options": {
+            "include": "R"
+          }
+        },
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "R"
+          },
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "U"
+                  }
+                },
+                "fieldName": "_k"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        },
+        {
+          "filter": {
+            "id": "byRefId",
+            "options": "R"
+          },
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "Reason",
+                "Kind",
+                "_visit",
+                "_n",
+                "Page",
+                "profile",
+                "selector",
+                "screenshot"
+              ]
+            }
+          }
+        },
+        {
+          "filter": {
+            "id": "anyMatch",
+            "options": [
+              {
+                "id": "byName",
+                "options": "D"
+              },
+              {
+                "id": "byRefId",
+                "options": "R"
+              }
+            ]
+          },
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "regex",
+                  "options": {
+                    "value": "^(${profile:pipe})$"
+                  }
+                },
+                "fieldName": "profile"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        },
+        {
+          "id": "partitionByValues",
+          "options": {
+            "fields": [
+              "_n"
+            ],
+            "keepFields": true,
+            "naming": {
+              "asLabels": false
+            }
+          }
+        },
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "Kind": 1,
+              "Page": 4,
+              "Reason": 0,
+              "_n": 3,
+              "_visit": 2,
+              "profile": 5,
+              "screenshot": 7,
+              "selector": 6
+            }
+          }
+        },
+        {
+          "id": "groupToNestedTable",
+          "options": {
+            "fields": {
+              "Kind": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "Reason": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "_n": {
+                "aggregations": [
+                  "sum"
+                ],
+                "operation": "aggregate"
+              },
+              "_visit": {
+                "aggregations": [
+                  "distinctCount"
+                ],
+                "operation": "aggregate"
+              }
+            },
+            "showSubframeHeaders": true
+          }
+        }
+      ],
+      "type": "table"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 41,
+  "tags": [
+    "reftrace"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "reftrace-reports"
+        },
+        "definition": "/ | $reverse($sort($[is_dir and $match(name, /^[0-9]{8}T[0-9]{6}Z/)].$substringBefore(name, \"/\")))",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Run",
+        "multi": false,
+        "name": "run",
+        "options": [],
+        "query": {
+          "infinityQuery": {
+            "columns": [],
+            "datasource": {
+              "type": "yesoreyeram-infinity-datasource",
+              "uid": "reftrace-reports"
+            },
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "variable",
+            "root_selector": "$reverse($sort($[is_dir and $match(name, /^[0-9]{8}T[0-9]{6}Z/)].$substringBefore(name, \"/\")))",
+            "source": "url",
+            "type": "json",
+            "url": "/",
+            "url_options": {
+              "data": "",
+              "headers": [
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "method": "GET"
+            }
+          },
+          "query": "",
+          "queryType": "infinity",
+          "refId": "variable"
+        },
+        "refresh": 2,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "reftrace-reports"
+        },
+        "definition": "/${run}/ | $count($[name = \"report.json\"]) > 0 ? \"report.json\" : \"\"",
+        "hide": 2,
+        "includeAll": false,
+        "label": "",
+        "multi": false,
+        "name": "report",
+        "options": [],
+        "query": {
+          "infinityQuery": {
+            "columns": [],
+            "datasource": {
+              "type": "yesoreyeram-infinity-datasource",
+              "uid": "reftrace-reports"
+            },
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "variable",
+            "root_selector": "$count($[name = \"report.json\"]) > 0 ? \"report.json\" : \"\"",
+            "source": "url",
+            "type": "json",
+            "url": "/${run}/",
+            "url_options": {
+              "data": "",
+              "headers": [
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "method": "GET"
+            }
+          },
+          "query": "",
+          "queryType": "infinity",
+          "refId": "variable"
+        },
+        "refresh": 2,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "reftrace-reports"
+        },
+        "definition": "/${run}/${report} | (\n  $keys := $distinct(pages.problems[expected and expected != \"\"].expected);\n  $profiles := $distinct(pages.profile)[$type($) = \"string\"];\n  $routes := $sort($distinct(pages.problems[route and route != \"\"].route))[$type($) = \"string\"];\n  $string({\n    \"key\": $count($keys) = 1 and $type($keys[0]) = \"string\" ? \" (expected key: \" & $keys[0] & \")\" : \"\",\n    \"profiles\": $append([], $profiles),\n    \"routes\": $append([], $routes)\n  })\n)",
+        "hide": 2,
+        "includeAll": false,
+        "label": "",
+        "multi": false,
+        "name": "meta",
+        "options": [],
+        "query": {
+          "infinityQuery": {
+            "columns": [],
+            "datasource": {
+              "type": "yesoreyeram-infinity-datasource",
+              "uid": "reftrace-reports"
+            },
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "variable",
+            "root_selector": "(\n  $keys := $distinct(pages.problems[expected and expected != \"\"].expected);\n  $profiles := $distinct(pages.profile)[$type($) = \"string\"];\n  $routes := $sort($distinct(pages.problems[route and route != \"\"].route))[$type($) = \"string\"];\n  $string({\n    \"key\": $count($keys) = 1 and $type($keys[0]) = \"string\" ? \" (expected key: \" & $keys[0] & \")\" : \"\",\n    \"profiles\": $append([], $profiles),\n    \"routes\": $append([], $routes)\n  })\n)",
+            "source": "url",
+            "type": "json",
+            "url": "/${run}/${report}",
+            "url_options": {
+              "data": "",
+              "headers": [
+                {
+                  "key": "Accept",
+                  "value": "application/json"
+                }
+              ],
+              "method": "GET"
+            }
+          },
+          "query": "",
+          "queryType": "infinity",
+          "refId": "variable"
+        },
+        "refresh": 2,
+        "skipUrlSync": true,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "reftrace-reports"
+        },
+        "definition": "${meta} | (key)",
+        "hide": 2,
+        "includeAll": false,
+        "label": "",
+        "multi": false,
+        "name": "key",
+        "options": [],
+        "query": {
+          "infinityQuery": {
+            "columns": [],
+            "data": "${meta}",
+            "datasource": {
+              "type": "yesoreyeram-infinity-datasource",
+              "uid": "reftrace-reports"
+            },
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "variable",
+            "root_selector": "(key)",
+            "source": "inline",
+            "type": "json"
+          },
+          "query": "",
+          "queryType": "infinity",
+          "refId": "variable"
+        },
+        "refresh": 2,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "reftrace-reports"
+        },
+        "definition": "${meta} | ($count(profiles) > 0 ? profiles : null)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Profile",
+        "multi": true,
+        "name": "profile",
+        "options": [],
+        "query": {
+          "infinityQuery": {
+            "columns": [],
+            "data": "${meta}",
+            "datasource": {
+              "type": "yesoreyeram-infinity-datasource",
+              "uid": "reftrace-reports"
+            },
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "variable",
+            "root_selector": "($count(profiles) > 0 ? profiles : null)",
+            "source": "inline",
+            "type": "json"
+          },
+          "query": "",
+          "queryType": "infinity",
+          "refId": "variable"
+        },
+        "refresh": 2,
+        "sort": 0,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "text": [
+            "All"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "reftrace-reports"
+        },
+        "definition": "${meta} | ($count(routes) > 0 ? routes : null)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Route",
+        "multi": true,
+        "name": "route",
+        "options": [],
+        "query": {
+          "infinityQuery": {
+            "columns": [],
+            "data": "${meta}",
+            "datasource": {
+              "type": "yesoreyeram-infinity-datasource",
+              "uid": "reftrace-reports"
+            },
+            "filters": [],
+            "format": "table",
+            "parser": "backend",
+            "refId": "variable",
+            "root_selector": "($count(routes) > 0 ? routes : null)",
+            "source": "inline",
+            "type": "json"
+          },
+          "query": "",
+          "queryType": "infinity",
+          "refId": "variable"
+        },
+        "refresh": 2,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-14d",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "title": "Reftrace — run",
+  "uid": "reftrace-run"
+}

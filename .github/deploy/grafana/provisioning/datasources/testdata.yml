@@ -1,0 +1,11 @@
+apiVersion: 1
+
+# Carries the column settings of the nested rows on the run dashboard: Grafana 12.1 ignores panel
+# field overrides inside nested tables, so an empty frame from this data source brings them.
+# The uid is fixed because the run dashboard refers to it.
+datasources:
+  - name: Run dashboard columns (TestData)
+    uid: reftrace-testdata
+    type: grafana-testdata-datasource
+    access: proxy
+    editable: false

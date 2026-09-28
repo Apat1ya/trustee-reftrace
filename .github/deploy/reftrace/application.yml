@@ -1,0 +1,51 @@
+# Stand settings over the defaults in src/main/resources/application.yml; only what differs is here.
+# Mounted as /app/config/application.yml; the container's environment overrides it in turn.
+spring:
+  main:
+    # No web server yet: keeps the JVM up between scheduled runs.
+    keep-alive: true
+
+management:
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          # One trace per page visit, to Tempo inside the stand's network.
+          endpoint: http://tempo:4318/v1/traces
+  otlp:
+    metrics:
+      export:
+        # Metrics every minute and once more on the way out, to Prometheus inside the stand's network.
+        enabled: true
+        url: http://prometheus:9090/api/v1/otlp/v1/metrics
+
+reftrace:
+  # Two browsers fit in the box's 2 GB, with swap.
+  parallel-browsers: 2
+  # QR codes are not read on the stand.
+  qr-check: false
+  limits:
+    action:
+      # A cold or busy browser on this box takes up to ~30 s to a page's DOMContentLoaded; at 15 s one load in six fails.
+      page-load: 30s
+      # A link lookup waits out the previous install click's stopped navigation, up to 20 s on this box.
+      operation: 15s
+      # WebKit on this box reacts to an install click in up to ~6 s; at 2 s most of its clicks fail.
+      click-navigation: 8s
+    visit:
+      # A slow page on this box outlives 60 s in its exit clicks or settle; the watchdog then kills the browser.
+      deadline: 120s
+  schedule:
+    enabled: true
+    # UTC.
+    cron: "0 0 3 * * *"
+  report:
+    output-dir: /app/runs
+    # No screenshots; their horizon only has to stay within the run's.
+    screenshots: false
+    traces: true
+    retention:
+      run: 3d
+      screenshots: 3d
+      # Traces of the failed visits are kept for a day.
+      traces: 1d

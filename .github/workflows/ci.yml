@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - master
+      # Not master: Deploy runs this workflow itself on a push there.
       - main
       - 'feature/**'
       # Deploy runs this workflow itself before it builds the image.

@@ -5,7 +5,7 @@ name: Deploy
 # Secrets: DEPLOY_HOST, DEPLOY_SSH_KEY (private key of a user in the docker group, ubuntu by default),
 # REPORTS_PASSWORD (basic auth for the reports), TELEGRAM_BOT_TOKEN (the bot that sends the alerts).
 # Variables: SITE_ADDRESS (the host name the reports are served on), TELEGRAM_CHAT_ID (the chat the
-# alerts go to); optional DEPLOY_USER, PARALLEL_BROWSERS.
+# alerts go to); optional DEPLOY_USER.
 # The stand itself is in .github/deploy, the steps on the host in .github/scripts/deploy.sh.
 
 on:
@@ -84,7 +84,6 @@ jobs:
           TARGET: ${{ vars.DEPLOY_USER || 'ubuntu' }}@${{ secrets.DEPLOY_HOST }}
           IMAGE: ${{ env.IMAGE }}:${{ github.sha }}
           SITE_ADDRESS: ${{ vars.SITE_ADDRESS }}
-          PARALLEL_BROWSERS: ${{ vars.PARALLEL_BROWSERS }}
           REPORTS_PASSWORD: ${{ secrets.REPORTS_PASSWORD }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ vars.TELEGRAM_CHAT_ID }}

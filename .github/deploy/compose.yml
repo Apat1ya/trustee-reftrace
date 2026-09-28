@@ -16,28 +16,12 @@ services:
     # Chromium keeps its shared memory in /dev/shm; Docker's 64 MB is too small.
     ipc: host
     stop_grace_period: 60s
+    # Its settings are in reftrace/application.yml.
     environment:
       TZ: UTC
-      # No web server yet: keeps the JVM up between scheduled runs.
-      SPRING_MAIN_KEEPALIVE: "true"
-      REFTRACE_SCHEDULE_ENABLED: "true"
-      REFTRACE_SCHEDULE_CRON: ${REFTRACE_SCHEDULE_CRON:-0 0 3 * * *}
-      REFTRACE_PARALLELBROWSERS: ${REFTRACE_PARALLEL_BROWSERS:-2}
-      REFTRACE_REPORT_OUTPUTDIR: /app/runs
-      # No screenshots; the traces of the failed visits are kept for a day, the runs for three.
-      # Screenshots are off, so their horizon only has to stay within the run's.
-      REFTRACE_REPORT_SCREENSHOTS: "false"
-      REFTRACE_REPORT_TRACES: "true"
-      REFTRACE_REPORT_RETENTION_RUN: 3d
-      REFTRACE_REPORT_RETENTION_SCREENSHOTS: 3d
-      REFTRACE_REPORT_RETENTION_TRACES: 1d
       JAVA_TOOL_OPTIONS: ${REFTRACE_JAVA_OPTIONS:-}
-      # One trace per page visit, to Tempo inside this network.
-      MANAGEMENT_OPENTELEMETRY_TRACING_EXPORT_OTLP_ENDPOINT: http://tempo:4318/v1/traces
-      # Its metrics, every minute and once more on the way out, to Prometheus inside this network.
-      MANAGEMENT_OTLP_METRICS_EXPORT_ENABLED: "true"
-      MANAGEMENT_OTLP_METRICS_EXPORT_URL: http://prometheus:9090/api/v1/otlp/v1/metrics
     volumes:
+      - ./reftrace/application.yml:/app/config/application.yml:ro
       - runs:/app/runs
     # The image's check calls the actuator, which the app does not have yet.
     healthcheck:

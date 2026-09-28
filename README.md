@@ -94,7 +94,7 @@ files, and restarts the containers.
 | `TELEGRAM_BOT_TOKEN` | secret | alert bot |
 | `SITE_ADDRESS` | variable | host name or IP; a host name gets a Let's Encrypt certificate |
 | `TELEGRAM_CHAT_ID` | variable | alert chat |
-| `DEPLOY_USER`, `PARALLEL_BROWSERS` | variable | optional; default `ubuntu`, `2` |
+| `DEPLOY_USER` | variable | optional; default `ubuntu` |
 
 ### Operations
 
@@ -119,9 +119,10 @@ docker compose run --rm -d --name reftrace-run-once reftrace --run-once   # extr
 docker compose restart reftrace                                           # stuck run
 ```
 
-The schedule is `REFTRACE_SCHEDULE_CRON` in `compose.yml` (UTC). Change it there and push: the deploy
-rewrites `.env`. Traces of failed visits (`/reports/<run>/traces/*.zip`) open at
-<https://trace.playwright.dev>.
+The stand's settings, the schedule among them (UTC), are
+[`.github/deploy/reftrace/application.yml`](.github/deploy/reftrace/application.yml): only what differs
+from the defaults. Change it there and push: the deploy copies it and restarts the monitor. Traces of
+failed visits (`/reports/<run>/traces/*.zip`) open at <https://trace.playwright.dev>.
 
 ## How it works
 

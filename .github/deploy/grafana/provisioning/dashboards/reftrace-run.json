@@ -920,7 +920,7 @@
         "type": "datasource",
         "uid": "-- Mixed --"
       },
-      "description": "One row per page for the selected devices and routes (pages[] of report.json summed over its visits; one visit = page + profile). The arrow lists the page's problems; the same problem (href, selector, actual, route, checked, expected) seen on several of the selected devices is one row; path and screenshot are from its first occurrence. actual null = no key found. Not checked ignores the Route filter (untested items have no route). Long cells are one line: hover a cell and click its inspect icon.",
+      "description": "One row per page for the selected devices and routes (pages[] of report.json summed over its visits; one visit = page + profile). The arrow lists the page's problems; the same problem (href, selector, actual, route, checked, expected) seen on several of the selected devices is one row; path is from its first occurrence. actual null = no key found; a single empty row with route \"no problems\" = the page had no key problems (only Not checked ones). Not checked ignores the Route filter (untested items have no route). Long cells are one line: hover a cell and click its inspect icon.",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -1119,7 +1119,7 @@
             "type": "grafana-testdata-datasource",
             "uid": "reftrace-testdata"
           },
-          "rawFrameContent": "[{\"name\": \"C\", \"fields\": [{\"name\": \"Page\", \"type\": \"string\", \"values\": [], \"config\": {}}, {\"name\": \"profile\", \"type\": \"string\", \"values\": [], \"config\": {}}, {\"name\": \"route\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 115}}}, {\"name\": \"href\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 260, \"inspect\": true, \"cellOptions\": {\"type\": \"auto\", \"wrapText\": false}}}}, {\"name\": \"expected\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 125}}}, {\"name\": \"actual\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 125}, \"noValue\": \"null\"}}, {\"name\": \"selector\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 240, \"inspect\": true, \"cellOptions\": {\"type\": \"auto\", \"wrapText\": false}}}}, {\"name\": \"checked\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"hidden\": true}}}, {\"name\": \"screenshot\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 200, \"inspect\": true, \"cellOptions\": {\"type\": \"auto\", \"wrapText\": false}}}}, {\"name\": \"path\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"inspect\": true, \"cellOptions\": {\"type\": \"auto\", \"wrapText\": false}}}}, {\"name\": \"_p\", \"type\": \"number\", \"values\": [], \"config\": {}}, {\"name\": \"_rk\", \"type\": \"string\", \"values\": [], \"config\": {}}]}, {\"name\": \"D\", \"fields\": [{\"name\": \"Reason\", \"type\": \"string\", \"values\": [], \"config\": {}}, {\"name\": \"Kind\", \"type\": \"string\", \"values\": [], \"config\": {}}, {\"name\": \"_visit\", \"type\": \"string\", \"values\": [], \"config\": {}}, {\"name\": \"_n\", \"type\": \"number\", \"values\": [], \"config\": {}}, {\"name\": \"Page\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 420}, \"links\": [{\"title\": \"Open on the site\", \"url\": \"${__value.raw}\", \"targetBlank\": true}]}}, {\"name\": \"profile\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 130}}}, {\"name\": \"selector\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 420, \"inspect\": true, \"cellOptions\": {\"type\": \"auto\", \"wrapText\": false}}}}, {\"name\": \"screenshot\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"inspect\": true, \"cellOptions\": {\"type\": \"auto\", \"wrapText\": false}}}}]}]",
+          "rawFrameContent": "[{\"name\": \"C\", \"fields\": [{\"name\": \"Page\", \"type\": \"string\", \"values\": [], \"config\": {}}, {\"name\": \"profile\", \"type\": \"string\", \"values\": [], \"config\": {}}, {\"name\": \"route\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 115}, \"noValue\": \"no problems\"}}, {\"name\": \"href\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 260, \"inspect\": true, \"cellOptions\": {\"type\": \"auto\", \"wrapText\": false}}}}, {\"name\": \"expected\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 125}}}, {\"name\": \"actual\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 125}}}, {\"name\": \"selector\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 240, \"inspect\": true, \"cellOptions\": {\"type\": \"auto\", \"wrapText\": false}}}}, {\"name\": \"checked\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"hidden\": true}}}, {\"name\": \"path\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"inspect\": true, \"cellOptions\": {\"type\": \"auto\", \"wrapText\": false}}}}, {\"name\": \"_p\", \"type\": \"number\", \"values\": [], \"config\": {}}, {\"name\": \"_rk\", \"type\": \"string\", \"values\": [], \"config\": {}}]}, {\"name\": \"D\", \"fields\": [{\"name\": \"Reason\", \"type\": \"string\", \"values\": [], \"config\": {}}, {\"name\": \"Kind\", \"type\": \"string\", \"values\": [], \"config\": {}}, {\"name\": \"_visit\", \"type\": \"string\", \"values\": [], \"config\": {}}, {\"name\": \"_n\", \"type\": \"number\", \"values\": [], \"config\": {}}, {\"name\": \"Page\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 420}, \"links\": [{\"title\": \"Open on the site\", \"url\": \"${__value.raw}\", \"targetBlank\": true}]}}, {\"name\": \"profile\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 130}}}, {\"name\": \"selector\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"width\": 320, \"inspect\": true, \"cellOptions\": {\"type\": \"auto\", \"wrapText\": false}}}}, {\"name\": \"detail\", \"type\": \"string\", \"values\": [], \"config\": {\"custom\": {\"align\": \"auto\", \"inspect\": true, \"cellOptions\": {\"type\": \"auto\", \"wrapText\": false}}}}]}]",
           "refId": "C",
           "scenarioId": "raw_frame"
         },
@@ -1133,7 +1133,7 @@
           "format": "table",
           "parser": "backend",
           "refId": "R",
-          "root_selector": "(\n  $t := (\n  $ch := coverage.checks;\n  $mismatch := $exists($ch) ? $ch.mismatch : $exists(coverage.brokenLinksFound) ? coverage.brokenLinksFound : $count(problems);\n  $exists(run) ? {\n    \"_k\": \"T\",\n    \"Run · \" & $fromMillis($toMillis(run.startedAt), \"[MNn,3-3] [D01], [H01]:[m01] UTC\"): $mismatch > 0 ? \"Issues found\" : \"OK\",\n    \"Links checked\": coverage.links.checked,\n    \"Passed\": $ch.pass,\n    \"Key lost or replaced\": $ch.mismatch\n  } : { \"_k\": \"T\", \"Run\": \"No report (crashed or running)\" }\n);\n  $v := (\n  $routes := $join($map($sort($distinct(pages.problems[route and route != \"\"].route)), function($r) { \"«\" & $r & \"»\" }));\n  $root := $;\n  [pages.(\n    $p := $;\n    {\n      \"_k\": \"V\", \"Page\": $p.page, \"profile\": $p.profile, \"_dev\": $p.profile,\n      \"Scenarios\": $join($sort($distinct($root.pages[page = $p.page].scenarios)), \", \"),\n      \"_v\": 1, \"_nc\": $count($p.untested), \"_rk\": $routes\n    }\n  )]\n);\n  $p := (\n  $compact := function($v) {\n    $type($v) = \"string\" ? $v\n    : $type($v) = \"object\" ? $join($each($v, function($x, $k) { $k & \"=\" & $x }), \", \")\n    : $exists($v) and $type($v) != \"null\" ? $string($v) : \"null\"\n  };\n  [pages.(\n    $p := $;\n    $steps := $join($map($p.path, function($s, $i) { ($i + 1) & \". \" & $s }), \" | \");\n    problems.{\n      \"_k\": \"P\", \"Page\": $p.page, \"profile\": $p.profile, \"route\": route ? route : \"\", \"href\": href ? href : \"\",\n      \"expected\": expected ? expected : \"\", \"actual\": $compact(actual), \"selector\": selector ? selector : \"\",\n      \"checked\": $compact(checked), \"screenshot\": screenshot ? screenshot : \"\", \"path\": $steps ? $steps : \"\",\n      \"_p\": 1, \"_rk\": \"«\" & (route ? route : \"\") & \"»\"\n    }\n  )]\n);\n  $u := (\n  $site := [\"qrHidden\", \"qrUnreadable\", \"pageGone\"];\n  [pages.(\n    $p := $;\n    untested.{\n      \"_k\": \"U\", \"Reason\": reason ? reason : \"\",\n      \"Kind\": reason in $site ? \"not testable (site)\" : \"check failed (tool)\",\n      \"_visit\": $p.page & \" \" & $p.profile, \"_n\": 1, \"Page\": $p.page, \"profile\": $p.profile,\n      \"selector\": selector ? selector : \"\", \"screenshot\": screenshot ? screenshot : \"\"\n    }\n  )]\n);\n  $append($append($append([$t], $v), $p), $u)\n)",
+          "root_selector": "(\n  $t := (\n  $ch := coverage.checks;\n  $mismatch := $exists($ch) ? $ch.mismatch : $exists(coverage.brokenLinksFound) ? coverage.brokenLinksFound : $count(problems);\n  $exists(run) ? {\n    \"_k\": \"T\",\n    \"Run · \" & $fromMillis($toMillis(run.startedAt), \"[MNn,3-3] [D01], [H01]:[m01] UTC\"): $mismatch > 0 ? \"Issues found\" : \"OK\",\n    \"Links checked\": coverage.links.checked,\n    \"Passed\": $ch.pass,\n    \"Key lost or replaced\": $ch.mismatch\n  } : { \"_k\": \"T\", \"Run\": \"No report (crashed or running)\" }\n);\n  $v := (\n  $routes := $join($map($sort($distinct(pages.problems[route and route != \"\"].route)), function($r) { \"«\" & $r & \"»\" }));\n  $root := $;\n  [pages.(\n    $p := $;\n    {\n      \"_k\": \"V\", \"Page\": $p.page, \"profile\": $p.profile, \"_dev\": $p.profile,\n      \"Scenarios\": $join($sort($distinct($root.pages[page = $p.page].scenarios)), \", \"),\n      \"_v\": 1, \"_nc\": $count($p.untested), \"_rk\": $routes\n    }\n  )]\n);\n  $p := (\n  $compact := function($v) {\n    $type($v) = \"string\" ? $v\n    : $type($v) = \"object\" ? $join($each($v, function($x, $k) { $k & \"=\" & $x }), \", \")\n    : $exists($v) and $type($v) != \"null\" ? $string($v) : \"null\"\n  };\n  [pages.(\n    $p := $;\n    $steps := $join($map($p.path, function($s, $i) { ($i + 1) & \". \" & $s }), \" | \");\n    problems.{\n      \"_k\": \"P\", \"Page\": $p.page, \"profile\": $p.profile, \"route\": route ? route : \"—\", \"href\": href ? href : \"\",\n      \"expected\": expected ? expected : \"\", \"actual\": $compact(actual), \"selector\": selector ? selector : \"\",\n      \"checked\": $compact(checked), \"path\": $steps ? $steps : \"\",\n      \"_p\": 1, \"_rk\": \"«\" & (route ? route : \"\") & \"»\"\n    }\n  )]\n);\n  $u := (\n  $site := [\"qrHidden\", \"qrUnreadable\", \"pageGone\"];\n  [pages.(\n    $p := $;\n    untested.{\n      \"_k\": \"U\", \"Reason\": reason ? reason : \"\",\n      \"Kind\": reason in $site ? \"not testable (site)\" : \"check failed (tool)\",\n      \"_visit\": $p.page & \" \" & $p.profile, \"_n\": 1, \"Page\": $p.page, \"profile\": $p.profile,\n      \"selector\": selector ? selector : \"\", \"detail\": detail ? detail : \"\"\n    }\n  )]\n);\n  $append($append($append([$t], $v), $p), $u)\n)",
           "source": "url",
           "type": "json",
           "url": "/${run}/${report}",
@@ -1149,7 +1149,7 @@
           }
         }
       ],
-      "title": "Pages — arrow on the left lists the page's problems${key}",
+      "title": "Pages — arrow on the left lists the page's problems",
       "transformations": [
         {
           "filter": {
@@ -1256,7 +1256,6 @@
                 "actual",
                 "selector",
                 "checked",
-                "screenshot",
                 "path",
                 "_p",
                 "_rk"
@@ -1360,12 +1359,6 @@
                 "aggregations": [],
                 "operation": "groupby"
               },
-              "screenshot": {
-                "aggregations": [
-                  "first"
-                ],
-                "operation": "aggregate"
-              },
               "selector": {
                 "aggregations": [],
                 "operation": "groupby"
@@ -1410,14 +1403,12 @@
               "checked": 11,
               "expected": 8,
               "href": 7,
-              "path (first)": 13,
+              "path (first)": 12,
               "route": 6,
-              "screenshot (first)": 12,
               "selector": 10
             },
             "renameByName": {
-              "path (first)": "path",
-              "screenshot (first)": "screenshot"
+              "path (first)": "path"
             }
           }
         },
@@ -1471,7 +1462,7 @@
         "type": "datasource",
         "uid": "-- Dashboard --"
       },
-      "description": "untested[] of report.json grouped by reason, for the selected devices; the arrow lists every element not checked (page, profile, selector, screenshot). untested[] entries have no route, so the Route filter does not apply here; the Profile filter does.",
+      "description": "untested[] of report.json grouped by reason, for the selected devices; the arrow lists every element not checked (page, profile, selector, detail). Reasons about the whole page (pageLoadTimeout, httpStatus, internal, ...) have no selector: detail says what went wrong. untested[] entries have no route, so the Route filter does not apply here; the Profile filter does.",
       "fieldConfig": {
         "defaults": {
           "custom": {
@@ -1641,7 +1632,7 @@
                 "Page",
                 "profile",
                 "selector",
-                "screenshot"
+                "detail"
               ]
             }
           }
@@ -1707,8 +1698,8 @@
               "_n": 3,
               "_visit": 2,
               "profile": 5,
-              "screenshot": 7,
-              "selector": 6
+              "selector": 6,
+              "detail": 7
             }
           }
         },
@@ -1851,7 +1842,7 @@
           "type": "yesoreyeram-infinity-datasource",
           "uid": "reftrace-reports"
         },
-        "definition": "/${run}/${report} | (\n  $keys := $distinct(pages.problems[expected and expected != \"\"].expected);\n  $profiles := $distinct(pages.profile)[$type($) = \"string\"];\n  $routes := $sort($distinct(pages.problems[route and route != \"\"].route))[$type($) = \"string\"];\n  $string({\n    \"key\": $count($keys) = 1 and $type($keys[0]) = \"string\" ? \" (expected key: \" & $keys[0] & \")\" : \"\",\n    \"profiles\": $append([], $profiles),\n    \"routes\": $append([], $routes)\n  })\n)",
+        "definition": "/${run}/${report} | (\n  $profiles := $distinct(pages.profile)[$type($) = \"string\"];\n  $routes := $sort($distinct(pages.problems[route and route != \"\"].route))[$type($) = \"string\"];\n  $string({\n    \"profiles\": $append([], $profiles),\n    \"routes\": $append([], $routes)\n  })\n)",
         "hide": 2,
         "includeAll": false,
         "label": "",
@@ -1869,7 +1860,7 @@
             "format": "table",
             "parser": "backend",
             "refId": "variable",
-            "root_selector": "(\n  $keys := $distinct(pages.problems[expected and expected != \"\"].expected);\n  $profiles := $distinct(pages.profile)[$type($) = \"string\"];\n  $routes := $sort($distinct(pages.problems[route and route != \"\"].route))[$type($) = \"string\"];\n  $string({\n    \"key\": $count($keys) = 1 and $type($keys[0]) = \"string\" ? \" (expected key: \" & $keys[0] & \")\" : \"\",\n    \"profiles\": $append([], $profiles),\n    \"routes\": $append([], $routes)\n  })\n)",
+            "root_selector": "(\n  $profiles := $distinct(pages.profile)[$type($) = \"string\"];\n  $routes := $sort($distinct(pages.problems[route and route != \"\"].route))[$type($) = \"string\"];\n  $string({\n    \"profiles\": $append([], $profiles),\n    \"routes\": $append([], $routes)\n  })\n)",
             "source": "url",
             "type": "json",
             "url": "/${run}/${report}",
@@ -1890,43 +1881,6 @@
         },
         "refresh": 2,
         "skipUrlSync": true,
-        "sort": 0,
-        "type": "query"
-      },
-      {
-        "current": {},
-        "datasource": {
-          "type": "yesoreyeram-infinity-datasource",
-          "uid": "reftrace-reports"
-        },
-        "definition": "${meta} | (key)",
-        "hide": 2,
-        "includeAll": false,
-        "label": "",
-        "multi": false,
-        "name": "key",
-        "options": [],
-        "query": {
-          "infinityQuery": {
-            "columns": [],
-            "data": "${meta}",
-            "datasource": {
-              "type": "yesoreyeram-infinity-datasource",
-              "uid": "reftrace-reports"
-            },
-            "filters": [],
-            "format": "table",
-            "parser": "backend",
-            "refId": "variable",
-            "root_selector": "(key)",
-            "source": "inline",
-            "type": "json"
-          },
-          "query": "",
-          "queryType": "infinity",
-          "refId": "variable"
-        },
-        "refresh": 2,
         "sort": 0,
         "type": "query"
       },

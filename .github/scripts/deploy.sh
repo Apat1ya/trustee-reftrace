@@ -3,7 +3,7 @@
 #
 # Environment: TARGET (user@host), IMAGE (full reference), SITE_ADDRESS, REPORTS_PASSWORD,
 # TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID (where Alertmanager sends the alerts),
-# GHCR_USER and GHCR_TOKEN (to pull the image), PARALLEL_BROWSERS (optional, 2 by default).
+# GHCR_USER and GHCR_TOKEN (to pull the image).
 set -euo pipefail
 
 : "${TARGET:?}" "${IMAGE:?}" "${SITE_ADDRESS:?set the SITE_ADDRESS variable}" "${REPORTS_PASSWORD:?}"
@@ -12,7 +12,7 @@ set -euo pipefail
 here="$(dirname "$0")/../deploy"
 
 ssh "$TARGET" 'mkdir -p ~/reftrace'
-scp -r "$here/compose.yml" "$here/Caddyfile" "$here/site" "$here/tempo" "$here/grafana" \
+scp -r "$here/compose.yml" "$here/Caddyfile" "$here/site" "$here/reftrace" "$here/tempo" "$here/grafana" \
   "$here/prometheus" "$here/alertmanager" "$TARGET":reftrace/
 
 # Two browsers do not fit in 2 GB of memory without it. A night's run swaps out well under
@@ -26,7 +26,6 @@ hash=$(printf '%s' "$REPORTS_PASSWORD" | ssh "$TARGET" \
   'docker run --rm -i caddy:2 sh -c "caddy hash-password --plaintext \"\$(cat)\""')
 ssh "$TARGET" 'cat > reftrace/.env' <<ENV
 REFTRACE_IMAGE=${IMAGE}
-REFTRACE_PARALLEL_BROWSERS=${PARALLEL_BROWSERS:-2}
 SITE_ADDRESS=${SITE_ADDRESS}
 REPORTS_PASSWORD_HASH='${hash}'
 ENV

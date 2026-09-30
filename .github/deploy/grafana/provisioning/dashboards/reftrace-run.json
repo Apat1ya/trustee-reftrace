@@ -776,6 +776,483 @@
     },
     {
       "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "run.startedAt to run.finishedAt of report.json. Whole run.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "noValue": "–",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_dur"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Run duration"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 0,
+        "y": 4
+      },
+      "id": 201,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Run duration$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 14,
+          "valueSize": 32
+        },
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 20,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "",
+      "transformations": [
+        {
+          "id": "filterByRefId",
+          "options": {
+            "include": "R"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "T"
+                  }
+                },
+                "fieldName": "_k"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "Per device: distinct start pages (sitemap + start list) the run opened, of coverage.pages.start. Opened = a visit whose path is only the enter step. When coverage.scenarios.entry (start-page visits, all devices) reaches start x devices, every device opened all. Otherwise counted from pages[], which keeps only visits with problems or not-checked items; if that misses some start-page visits the number is a lower bound, shown as ≥.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "noValue": "–",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 9,
+        "x": 4,
+        "y": 4
+      },
+      "id": 202,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/.*/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 13,
+          "valueSize": 18
+        },
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 20,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "Start pages opened · of sitemap total",
+      "transformations": [
+        {
+          "id": "filterByRefId",
+          "options": {
+            "include": "R"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "S"
+                  }
+                },
+                "fieldName": "_k"
+              },
+              {
+                "config": {
+                  "id": "regex",
+                  "options": {
+                    "value": "^(${profile:pipe})$"
+                  }
+                },
+                "fieldName": "profile"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "includeByName": {
+              "Opened": true,
+              "profile": true
+            },
+            "indexByName": {
+              "Opened": 1,
+              "profile": 0
+            }
+          }
+        },
+        {
+          "id": "rowsToFields",
+          "options": {
+            "mappings": [
+              {
+                "fieldName": "profile",
+                "handlerKey": "field.name"
+              },
+              {
+                "fieldName": "Opened",
+                "handlerKey": "field.value"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "Stopped early (limit) = some device did not open every start page. The walker takes one-step paths first, so an unopened start page means the run was cut (time limit, or a start visit given up). Start pages all opened = every device opened every start page; it cannot tell whether deeper clicks were cut. Whole run.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [
+            {
+              "options": {
+                "Start pages all opened": {
+                  "color": "green",
+                  "index": 1
+                },
+                "Stopped early (limit)": {
+                  "color": "orange",
+                  "index": 0
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "noValue": "–",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "transparent",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "_stop"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Stopped by limit"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 5,
+        "x": 13,
+        "y": 4
+      },
+      "id": 204,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/^Stopped by limit$/",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {
+          "titleSize": 14,
+          "valueSize": 20
+        },
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 20,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "",
+      "transformations": [
+        {
+          "id": "filterByRefId",
+          "options": {
+            "include": "R"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "T"
+                  }
+                },
+                "fieldName": "_k"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "datasource",
+        "uid": "-- Dashboard --"
+      },
+      "description": "coverage.scenarios of report.json: visits per scenario. A visit counts for every scenario its path belongs to, so a start-page visit counts for all four; in short runs that only open start pages all four are equal. Whole run, not filtered.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "blue",
+            "mode": "fixed"
+          },
+          "min": 0,
+          "noValue": "–",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 4
+      },
+      "id": 205,
+      "options": {
+        "displayMode": "basic",
+        "legend": {
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 10,
+        "minVizWidth": 8,
+        "namePlacement": "left",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "text"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "datasource",
+            "uid": "-- Dashboard --"
+          },
+          "panelId": 20,
+          "refId": "A",
+          "withTransforms": false
+        }
+      ],
+      "title": "Visits by scenario · whole run",
+      "transformations": [
+        {
+          "id": "filterByRefId",
+          "options": {
+            "include": "R"
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "config": {
+                  "id": "equal",
+                  "options": {
+                    "value": "N"
+                  }
+                },
+                "fieldName": "_k"
+              }
+            ],
+            "match": "all",
+            "type": "include"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "includeByName": {
+              "Scenario": true,
+              "_sv": true
+            },
+            "indexByName": {
+              "Scenario": 0,
+              "_sv": 1
+            }
+          }
+        },
+        {
+          "id": "rowsToFields",
+          "options": {
+            "mappings": [
+              {
+                "fieldName": "Scenario",
+                "handlerKey": "field.name"
+              },
+              {
+                "fieldName": "_sv",
+                "handlerKey": "field.value"
+              }
+            ]
+          }
+        }
+      ],
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
         "type": "prometheus",
         "uid": "reftrace-prometheus"
       },
@@ -857,7 +1334,7 @@
         "h": 4,
         "w": 24,
         "x": 0,
-        "y": 4
+        "y": 9
       },
       "hideTimeOverride": true,
       "id": 101,
@@ -1097,7 +1574,7 @@
         "h": 14,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 13
       },
       "id": 20,
       "options": {
@@ -1133,7 +1610,7 @@
           "format": "table",
           "parser": "backend",
           "refId": "R",
-          "root_selector": "(\n  $t := (\n  $ch := coverage.checks;\n  $mismatch := $exists($ch) ? $ch.mismatch : $exists(coverage.brokenLinksFound) ? coverage.brokenLinksFound : $count(problems);\n  $exists(run) ? {\n    \"_k\": \"T\",\n    \"Run · \" & $fromMillis($toMillis(run.startedAt), \"[MNn,3-3] [D01], [H01]:[m01] UTC\"): $mismatch > 0 ? \"Issues found\" : \"OK\",\n    \"Links checked\": coverage.links.checked,\n    \"Passed\": $ch.pass,\n    \"Key lost or replaced\": $ch.mismatch\n  } : { \"_k\": \"T\", \"Run\": \"No report (crashed or running)\" }\n);\n  $v := (\n  $routes := $join($map($sort($distinct(pages.problems[route and route != \"\"].route)), function($r) { \"«\" & $r & \"»\" }));\n  $root := $;\n  [pages.(\n    $p := $;\n    {\n      \"_k\": \"V\", \"Page\": $p.page, \"profile\": $p.profile, \"_dev\": $p.profile,\n      \"Scenarios\": $join($sort($distinct($root.pages[page = $p.page].scenarios)), \", \"),\n      \"_v\": 1, \"_nc\": $count($p.untested), \"_rk\": $routes\n    }\n  )]\n);\n  $p := (\n  $compact := function($v) {\n    $type($v) = \"string\" ? $v\n    : $type($v) = \"object\" ? $join($each($v, function($x, $k) { $k & \"=\" & $x }), \", \")\n    : $exists($v) and $type($v) != \"null\" ? $string($v) : \"null\"\n  };\n  [pages.(\n    $p := $;\n    $steps := $join($map($p.path, function($s, $i) { ($i + 1) & \". \" & $s }), \" | \");\n    problems.{\n      \"_k\": \"P\", \"Page\": $p.page, \"profile\": $p.profile, \"route\": route ? route : \"—\", \"href\": href ? href : \"\",\n      \"expected\": expected ? expected : \"\", \"actual\": $compact(actual), \"selector\": selector ? selector : \"\",\n      \"checked\": $compact(checked), \"path\": $steps ? $steps : \"\",\n      \"_p\": 1, \"_rk\": \"«\" & (route ? route : \"\") & \"»\"\n    }\n  )]\n);\n  $u := (\n  $site := [\"qrHidden\", \"qrUnreadable\", \"pageGone\"];\n  [pages.(\n    $p := $;\n    untested.{\n      \"_k\": \"U\", \"Reason\": reason ? reason : \"\",\n      \"Kind\": reason in $site ? \"not testable (site)\" : \"check failed (tool)\",\n      \"_visit\": $p.page & \" \" & $p.profile, \"_n\": 1, \"Page\": $p.page, \"profile\": $p.profile,\n      \"selector\": selector ? selector : \"\", \"detail\": detail ? detail : \"\"\n    }\n  )]\n);\n  $append($append($append([$t], $v), $p), $u)\n)",
+          "root_selector": "(\n  $cov := (\n    $start := coverage.pages.start;\n    $profiles := run.profiles;\n    $entry := coverage.scenarios.entry;\n    $root := $;\n    $seen := $profiles.(\n      $prof := $;\n      $count($distinct($root.pages[profile = $prof and $count(path) = 1].(path[0])))\n    );\n    $all := $exists($entry) ? $entry >= $start * $count($profiles) : $count($seen[$ < $start]) = 0;\n    $exact := $all or ($exists($entry) and $entry = $sum($seen));\n    {\n      \"known\": $exists($start) and $exists($profiles),\n      \"cut\": $not($all),\n      \"rows\": $exists($start) and $exists($profiles) ? [$map($profiles, function($prof, $i) {(\n        $open := $all ? $start : $seen[$i];\n        {\n          \"_k\": \"S\", \"profile\": $prof,\n          \"Opened\": ($exact ? \"\" : \"≥ \") & $open & \" of \" & $start\n            & ($start > 0 ? \" (\" & $round($open / $start * 100) & \" %)\" : \"\")\n        }\n      )})] : []\n    }\n  );\n  $n := (\n    $order := [\"entry\", \"browse\", \"key-replaced\", \"reload\"];\n    $sc := coverage.scenarios;\n    $exists($sc) and $type($sc) = \"object\" ? [$map(\n      $sort($keys($sc), function($a, $b) {(\n        $ia := $count($order[$ = $a]) > 0 ? $sum($map($order, function($o, $j) { $o = $a ? $j : 0 })) : 99;\n        $ib := $count($order[$ = $b]) > 0 ? $sum($map($order, function($o, $j) { $o = $b ? $j : 0 })) : 99;\n        $ia = $ib ? $a > $b : $ia > $ib\n      )}),\n      function($k) { { \"_k\": \"N\", \"Scenario\": $k, \"_sv\": $lookup($sc, $k) } }\n    )] : []\n  );\n  $t := (\n  $ch := coverage.checks;\n  $mismatch := $exists($ch) ? $ch.mismatch : $exists(coverage.brokenLinksFound) ? coverage.brokenLinksFound : $count(problems);\n  $exists(run) ? {\n    \"_k\": \"T\",\n    \"_dur\": (\n      $s := $round(($toMillis(run.finishedAt) - $toMillis(run.startedAt)) / 1000);\n      $s < 3600\n        ? $floor($s / 60) & \" min \" & $formatNumber($s % 60, \"00\") & \" s\"\n        : $floor($s / 3600) & \" h \" & $formatNumber($floor(($s % 3600) / 60), \"00\") & \" min\"\n    ),\n    \"_stop\": $cov.known ? ($cov.cut ? \"Stopped early (limit)\" : \"Start pages all opened\") : null,\n    \"Run · \" & $fromMillis($toMillis(run.startedAt), \"[MNn,3-3] [D01], [H01]:[m01] UTC\"): $mismatch > 0 ? \"Issues found\" : \"OK\",\n    \"Links checked\": coverage.links.checked,\n    \"Passed\": $ch.pass,\n    \"Key lost or replaced\": $ch.mismatch\n  } : { \"_k\": \"T\", \"Run\": \"No report (crashed or running)\" }\n);\n  $v := (\n  $routes := $join($map($sort($distinct(pages.problems[route and route != \"\"].route)), function($r) { \"«\" & $r & \"»\" }));\n  $root := $;\n  [pages.(\n    $p := $;\n    {\n      \"_k\": \"V\", \"Page\": $p.page, \"profile\": $p.profile, \"_dev\": $p.profile,\n      \"Scenarios\": $join($sort($distinct($root.pages[page = $p.page].scenarios)), \", \"),\n      \"_v\": 1, \"_nc\": $count($p.untested), \"_rk\": $routes\n    }\n  )]\n);\n  $p := (\n  $compact := function($v) {\n    $type($v) = \"string\" ? $v\n    : $type($v) = \"object\" ? $join($each($v, function($x, $k) { $k & \"=\" & $x }), \", \")\n    : $exists($v) and $type($v) != \"null\" ? $string($v) : \"null\"\n  };\n  [pages.(\n    $p := $;\n    $steps := $join($map($p.path, function($s, $i) { ($i + 1) & \". \" & $s }), \" | \");\n    problems.{\n      \"_k\": \"P\", \"Page\": $p.page, \"profile\": $p.profile, \"route\": route ? route : \"—\", \"href\": href ? href : \"\",\n      \"expected\": expected ? expected : \"\", \"actual\": $compact(actual), \"selector\": selector ? selector : \"\",\n      \"checked\": $compact(checked), \"path\": $steps ? $steps : \"\",\n      \"_p\": 1, \"_rk\": \"«\" & (route ? route : \"\") & \"»\"\n    }\n  )]\n);\n  $u := (\n  $site := [\"qrHidden\", \"qrUnreadable\", \"pageGone\"];\n  [pages.(\n    $p := $;\n    untested.{\n      \"_k\": \"U\", \"Reason\": reason ? reason : \"\",\n      \"Kind\": reason in $site ? \"not testable (site)\" : \"check failed (tool)\",\n      \"_visit\": $p.page & \" \" & $p.profile, \"_n\": 1, \"Page\": $p.page, \"profile\": $p.profile,\n      \"selector\": selector ? selector : \"\", \"detail\": detail ? detail : \"\"\n    }\n  )]\n);\n  $append($append($append($append($append([$t], $v), $p), $u), $cov.rows), $n)\n)",
           "source": "url",
           "type": "json",
           "url": "/${run}/${report}",
@@ -1555,7 +2032,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 22
+        "y": 27
       },
       "id": 10,
       "options": {
